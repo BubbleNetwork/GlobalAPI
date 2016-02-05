@@ -10,7 +10,6 @@ import de.mickare.xserver.events.XServerLoggedInEvent;
 import de.mickare.xserver.events.XServerMessageEvent;
 import de.mickare.xserver.exceptions.NotInitializedException;
 import de.mickare.xserver.net.XServer;
-import de.mickare.xserver.net.XServerObj;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -72,11 +71,13 @@ public class PacketHub implements XServerListener {
 
     @XEventHandler
     public void onConnect(XServerLoggedInEvent e){
+        System.out.println("Connecting to " + constructInfo(e.getServer()));
         for(PacketListener listener:listenerSet)listener.onConnect(new PacketInfo(e.getServer(),e.getChannel()));
     }
 
     @XEventHandler
     public void onDisconnect(XServerDisconnectEvent e){
+        System.out.println("Disconnecting from " + constructInfo(e.getServer()));
         for(PacketListener listener:listenerSet)listener.onDisconnect(new PacketInfo(e.getServer(),e.getChannel()));
     }
 
