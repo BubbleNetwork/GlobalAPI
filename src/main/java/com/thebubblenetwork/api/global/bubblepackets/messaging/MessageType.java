@@ -56,7 +56,7 @@ public enum MessageType {
         try {
             constructor = getClazz().getConstructor(byte[].class);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(clazz.getName() + " does not have a byte[] constructor");
         }
         constructor.setAccessible(true);
     }

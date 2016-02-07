@@ -4,6 +4,7 @@ import com.thebubblenetwork.api.global.bubblepackets.PacketHub;
 import com.thebubblenetwork.api.global.file.PropertiesFile;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import de.mickare.xserver.AbstractXServerManager;
+import de.mickare.xserver.XServerPlugin;
 
 import java.util.UUID;
 
@@ -28,7 +29,7 @@ public interface BubbleHub<PLUGIN,PLAYER>{
     SQLConnection getConnection();
     PropertiesFile getSQLProperties();
     PacketHub getPacketHub();
-    AbstractXServerManager getXManager();
+    XServerPlugin getXPlugin();
     void onEnable();
     void onDisable();
     void onLoad();

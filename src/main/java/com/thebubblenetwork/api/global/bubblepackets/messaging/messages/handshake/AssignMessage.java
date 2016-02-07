@@ -38,18 +38,13 @@ public class AssignMessage extends AbstractMessageObject {
     }
 
     public void parse(DataOutputStream out) throws IOException {
-        out.write(id);
+        out.writeInt(id);
         out.writeUTF(type.getName());
     }
 
     public void serialize(ByteArrayDataInput in){
         this.id = in.readInt();
-        try {
-            this.type = ServerTypeObject.getType(in.readUTF());
-        } catch (Exception e) {
-            //Automatic Catch Statement
-            e.printStackTrace();
-        }
+        this.type = ServerTypeObject.getType(in.readUTF());
     }
 
     public int getId() {

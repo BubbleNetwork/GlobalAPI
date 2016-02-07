@@ -7,7 +7,7 @@ import de.mickare.xserver.*;
 import de.mickare.xserver.annotations.XEventHandler;
 import de.mickare.xserver.events.XServerDisconnectEvent;
 import de.mickare.xserver.events.XServerLoggedInEvent;
-import de.mickare.xserver.events.XServerMessageEvent;
+import de.mickare.xserver.events.XServerMessageIncomingEvent;
 import de.mickare.xserver.exceptions.NotInitializedException;
 import de.mickare.xserver.net.XServer;
 
@@ -33,6 +33,7 @@ import java.util.Set;
 public class PacketHub implements XServerListener {
     private BubbleHub<?,?> plugin;
     private AbstractXServerManager manager;
+    private XServer currentserver;
 
     private Set<PacketListener> listenerSet = new HashSet<>();
 
@@ -45,16 +46,22 @@ public class PacketHub implements XServerListener {
             manager = XServerManager.getInstance();
         }
         catch (NotInitializedException ex){
-            plugin.logInfo("Could not find XServer instance, using plugin dependency");
-            try {
-                manager = plugin.getXManager();
-            }
-            catch (NotInitializedException e){
-                plugin.logSevere("Could not find XServer instance " + e);
-                plugin.endSetup("Could not find XServerManager");
-            }
+            findHard(plugin);
         }
+        if(manager == null)findHard(plugin);
         manager.getEventHandler().registerListenerUnsafe(plugin.getPlugin(),this);
+        currentserver = manager.getHomeServer();
+    }
+
+    private void findHard(BubbleHub<?,?> plugin){
+        plugin.logInfo("Could not find XServer instance, using plugin dependency");
+        try {
+            manager = plugin.getXPlugin().getManager();
+        }
+        catch (NotInitializedException e){
+            plugin.logSevere("Could not find XServer instance " + e);
+            plugin.endSetup("Could not find XServerManager");
+        }
     }
 
     public void sendMessage(XServer server,IPluginMessage message) throws IOException{
@@ -71,20 +78,23 @@ public class PacketHub implements XServerListener {
 
     @XEventHandler
     public void onConnect(XServerLoggedInEvent e){
+        if(!isValid(e.getServer()))return;
         System.out.println("Connecting to " + constructInfo(e.getServer()));
         for(PacketListener listener:listenerSet)listener.onConnect(new PacketInfo(e.getServer(),e.getChannel()));
     }
 
     @XEventHandler
     public void onDisconnect(XServerDisconnectEvent e){
+        if(!isValid(e.getServer()))return;
         System.out.println("Disconnecting from " + constructInfo(e.getServer()));
         for(PacketListener listener:listenerSet)listener.onDisconnect(new PacketInfo(e.getServer(),e.getChannel()));
     }
 
     @XEventHandler
-    public void onMessage(XServerMessageEvent e){
+    public void onMessage(XServerMessageIncomingEvent e){
         Message m = e.getMessage();
-        System.out.println("Receiving message from " + constructInfo(e.getServer()) + " in channel " + m.getSubChannel());
+        if(!isValid(m.getSender()))return;
+        System.out.println("Receiving message from " + constructInfo(m.getSender()) + " in channel " + m.getSubChannel());
         MessageType type = MessageType.getType(m.getSubChannel());
         if(type == null)return;
         IPluginMessage message;
@@ -94,10 +104,14 @@ public class PacketHub implements XServerListener {
             throwable.printStackTrace();
             return;
         }
-        for(PacketListener listener:listenerSet)listener.onMessage(new PacketInfo(e.getServer(),e.getChannel()),message);
+        for(PacketListener listener:listenerSet)listener.onMessage(new PacketInfo(m.getSender(),e.getChannel()),message);
     }
 
     private String constructInfo(XServer server){
-        return server.getName() + "@" + server.getHost() + " - " + server.getPassword();
+        return server.getName() + " @ " + server.getHost() + ":" + String.valueOf(server.getPort()) + " - " + server.getPassword();
+    }
+
+    public boolean isValid(XServer server){
+        return server != currentserver;
     }
 }

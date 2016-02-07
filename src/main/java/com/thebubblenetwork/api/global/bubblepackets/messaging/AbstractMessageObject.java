@@ -52,8 +52,8 @@ public abstract class AbstractMessageObject implements IPluginMessage{
     }
 
     public void process(byte[] bytes){
-        ByteArrayDataInput stream = ByteStreams.newDataInput(bytes);
-        serialize(stream);
+        ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
+        serialize(in);
     }
 
     public abstract void serialize(ByteArrayDataInput in);

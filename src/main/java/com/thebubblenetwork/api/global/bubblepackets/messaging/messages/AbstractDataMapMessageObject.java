@@ -107,7 +107,7 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
 
     public void parse(DataOutputStream out) throws IOException {
         parseInfo(out);
-        out.write(data.size());
+        out.writeInt(data.size());
         for(Map.Entry entry:getData().entrySet()){
             Object key = entry.getKey();
             byte[] keybytes = getBytes(key);

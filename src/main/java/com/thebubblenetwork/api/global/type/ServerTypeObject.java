@@ -1,5 +1,7 @@
 package com.thebubblenetwork.api.global.type;
 
+import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,14 +17,15 @@ public class ServerTypeObject implements ServerType {
 
     public static ServerType registerType(ServerType type){
         types.add(type);
+        BubbleHubObject.getInstance().logInfo("Registered servertype: " + type.getName());
         return type;
     }
 
-    public static ServerType getType(String name) throws Exception{
+    public static ServerType getType(String name){
         for(ServerType wrapper:types){
             if(wrapper.getName().equals(name))return wrapper;
         }
-        throw new Exception(name + " is not a correct servertype");
+        throw new IllegalArgumentException(name + " is not a correct servertype");
     }
 
     public static Set<ServerType> getTypes() {
@@ -32,7 +35,7 @@ public class ServerTypeObject implements ServerType {
     private String name,prefix;
     private int maxplayers;
 
-    private ServerTypeObject(String name, String prefix, int maxplayers) {
+    public ServerTypeObject(String name, String prefix, int maxplayers) {
         this.name = name;
         this.prefix = prefix;
         this.maxplayers = maxplayers;

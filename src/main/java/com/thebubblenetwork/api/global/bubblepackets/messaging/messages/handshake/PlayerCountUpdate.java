@@ -38,7 +38,7 @@ public class PlayerCountUpdate extends AbstractMessageObject {
     }
 
     public void parse(DataOutputStream out) throws IOException {
-        out.write(online);
+        out.writeInt(online);
     }
 
     public int getOnline(){

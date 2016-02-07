@@ -1,12 +1,19 @@
 package com.thebubblenetwork.api.global.plugin;
 
+import com.google.common.collect.ImmutableMap;
 import com.thebubblenetwork.api.global.bubblepackets.PacketHub;
 import com.thebubblenetwork.api.global.file.PropertiesFile;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
+import com.thebubblenetwork.api.global.sql.SQLUtil;
+import com.thebubblenetwork.api.global.type.ServerType;
+import com.thebubblenetwork.api.global.type.ServerTypeObject;
 
 import java.io.File;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,7 +44,58 @@ public abstract class BubbleHubObject<PLUGIN,PLAYER> implements BubbleHub<PLUGIN
     private PacketHub hub;
 
     public BubbleHubObject(){
+        logInfo("Assigning instance...");
         instance = this;
+    }
+
+    public final void onEnable(){
+
+        logInfo("Creating PacketHub");
+
+        hub = new PacketHub();
+
+        logInfo("PacketHub has been created");
+
+        logInfo("Enabling the plugin...");
+
+        onBubbleEnable();
+
+        logInfo("The plugin has been enabled");
+
+        logInfo("Registering PacketHub...");
+        runTaskLater(new Runnable() {
+            public void run() {
+                try {
+                    hub.register(getInstance());
+                }catch (Exception ex){
+
+                }
+                logInfo("PackHub has been registered");
+            }
+        },
+        bungee() ? 1L : 0L,
+        TimeUnit.SECONDS);
+    }
+
+    public final void onDisable(){
+        logInfo("Disabling plugin");
+
+        onBubbleDisable();
+
+        logInfo("Plugin is now disabled");
+
+        try {
+            getConnection().closeConnection();
+            logInfo("The database connection has been closed");
+        } catch (SQLException e) {
+            logSevere(e.getMessage());
+            logSevere("Could not close SQL connection");
+        }
+    }
+
+    public final void onLoad(){
+        //Loading properties
+        logInfo("Loading SQL Properties");
         if(!sqlpropertiesfile.exists()){
             try {
                 PropertiesFile.generateFresh(sqlpropertiesfile,new String[]
@@ -58,6 +116,11 @@ public abstract class BubbleHubObject<PLUGIN,PLAYER> implements BubbleHub<PLUGIN
             endSetup("Exception occurred when loading properties");
             return;
         }
+
+        logInfo("Loaded SQL Properties");
+
+        logInfo("Finding database information...");
+
         String temp;
         try {
             connection = new SQLConnection(
@@ -72,31 +135,16 @@ public abstract class BubbleHubObject<PLUGIN,PLAYER> implements BubbleHub<PLUGIN
             logSevere(ex.getMessage());
             endSetup("Invalid database port");
         }
-    }
-
-    public final void onEnable(){
-        hub = new PacketHub();
-        onBubbleEnable();
-        runTaskLater(new Runnable() {
-            public void run() {
-                hub.register(getInstance());
-            }
-        },
-        0L,
-        TimeUnit.MILLISECONDS);
-    }
-
-    public final void onDisable(){
-        onBubbleDisable();
-        try {
-            getConnection().closeConnection();
-        } catch (SQLException e) {
-            logSevere(e.getMessage());
-            logSevere("Could not close SQL connection");
+        catch (Exception ex){
+            logSevere(ex.getMessage());
+            endSetup("Invalid configuration");
         }
-    }
 
-    public final void onLoad(){
+        logInfo("Found database information");
+
+        //Connecting to MySQL
+        logInfo("Connecting to MySQL...");
+
         try {
             getConnection().openConnection();
         } catch (Exception e) {
@@ -104,8 +152,47 @@ public abstract class BubbleHubObject<PLUGIN,PLAYER> implements BubbleHub<PLUGIN
             endSetup("Could not establish connection to database");
             return;
         }
+
+        logInfo("Connected to MySQL");
+
+        //Loading server types
+
+        logInfo("Finding server types...");
+
+        try{
+            if(!SQLUtil.tableExists(getConnection(),"servertypes")){
+                SQLUtil.createTable(getConnection(),"servertypes",new ImmutableMap.Builder<String,Map.Entry<SQLUtil.SQLDataType,Integer>>()
+                        .put("name",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,32))
+                        .put("prefix",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,5))
+                        .put("maxplayer",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.INT,3))
+                        .build());
+                logInfo("Creating SQL ServerType Table");
+                endSetup("You must configure your servertypes!");
+            }
+            ResultSet set = SQLUtil.query(getConnection(),"servertypes","*",new SQLUtil.Where("1"));
+            while(set.next()){
+                ServerTypeObject.registerType(new ServerTypeObject(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer")));
+            }
+            set.close();
+        }
+        catch (Exception ex){
+            logSevere(ex.getMessage());
+            endSetup("Could not find server types");
+        }
+
+        logInfo("Loaded server types");
+        logInfo("Saving XServer Configuration...");
+
+
+        //Normal load stuff
         saveXServerDefaults();
+
+        logInfo("Saved XServer Configuration");
+        logInfo("Loading plugin");
+
         onBubbleLoad();
+
+        logInfo("Plugin loading complete");
     }
 
     public SQLConnection getConnection(){
@@ -120,6 +207,7 @@ public abstract class BubbleHubObject<PLUGIN,PLAYER> implements BubbleHub<PLUGIN
         return hub;
     }
 
+    public abstract boolean bungee();
     public abstract void runTaskLater(Runnable r,long l,TimeUnit timeUnit);
     public abstract void saveXServerDefaults();
     public abstract void onBubbleEnable();
