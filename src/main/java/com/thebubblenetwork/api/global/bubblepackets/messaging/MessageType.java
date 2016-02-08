@@ -4,8 +4,11 @@ import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.handshak
 import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.handshake.PlayerCountUpdate;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.request.PlayerDataRequest;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.response.PlayerDataResponse;
+import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 
 import java.lang.reflect.Constructor;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Copyright Statement
@@ -23,21 +26,27 @@ import java.lang.reflect.Constructor;
  * Project: com.thebubblenetwork.bubblebungee
  */
 
-public enum MessageType {
-    A("Assign",AssignMessage.class),
-    DATARQ("PlayerDataRequest", PlayerDataRequest.class),
-    C("PlayerCountHandshake",PlayerCountUpdate.class),
-    DATARE("PlayerDataResponse", PlayerDataResponse.class);
+public class MessageType {
+    private static Set<MessageType> typeSet = new HashSet<>();
+
+    public static MessageType register(Class<? extends IPluginMessage> clazz){
+        MessageType type;
+        if((type = getType(clazz)) != null)return type;
+        type = new MessageType(clazz.getName(),clazz);
+        typeSet.add(type);
+        BubbleHubObject.getInstance().logInfo("Registered PacketType " + type.getName());
+        return type;
+    }
 
     public static MessageType getType(String s){
-        for(MessageType type:values()){
+        for(MessageType type:typeSet){
             if(type.getName().equalsIgnoreCase(s))return type;
         }
         return null;
     }
 
     public static MessageType getType(Class<? extends IPluginMessage> clazz){
-        for(MessageType type:values()){
+        for(MessageType type:typeSet){
             if(type.getClazz() == clazz)return type;
         }
         return null;
@@ -50,7 +59,8 @@ public enum MessageType {
     private String name;
     private Class<? extends IPluginMessage> clazz;
     private Constructor<? extends IPluginMessage> constructor;
-    MessageType(String name,Class<? extends IPluginMessage> clazz){
+
+    private MessageType(String name,Class<? extends IPluginMessage> clazz){
         this.name = name;
         this.clazz = clazz;
         try {
@@ -76,5 +86,14 @@ public enum MessageType {
         catch (Exception ex){
             throw ex.getCause();
         }
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof MessageType){
+            MessageType type = (MessageType)o;
+            return type.getName().equalsIgnoreCase(getName()) || type.getClazz().getName().equals(type.getClazz().getName());
+        }
+        return false;
     }
 }

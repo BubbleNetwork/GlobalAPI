@@ -27,7 +27,7 @@ public abstract class AbstractMessageObject implements IPluginMessage{
     private MessageType type;
 
     public AbstractMessageObject(){
-        this.type = MessageType.getType(this);
+        this.type = MessageType.register(getClass());
     }
 
     public AbstractMessageObject(byte[] bytes){

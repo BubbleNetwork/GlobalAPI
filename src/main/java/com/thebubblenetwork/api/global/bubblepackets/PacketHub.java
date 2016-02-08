@@ -95,8 +95,15 @@ public class PacketHub implements XServerListener {
         Message m = e.getMessage();
         if(!isValid(m.getSender()))return;
         System.out.println("Receiving message from " + constructInfo(m.getSender()) + " in channel " + m.getSubChannel());
-        MessageType type = MessageType.getType(m.getSubChannel());
-        if(type == null)return;
+        MessageType type;
+        try{
+            Class<?> possibleclass = Class.forName(m.getSubChannel());
+            type = MessageType.register(possibleclass.asSubclass(IPluginMessage.class));
+        }
+        catch (Exception ex){
+            plugin.logInfo("Could not parse packet in channel: " + m.getSubChannel());
+            return;
+        }
         IPluginMessage message;
         try {
             message = type.newInstance(m.getContent());
