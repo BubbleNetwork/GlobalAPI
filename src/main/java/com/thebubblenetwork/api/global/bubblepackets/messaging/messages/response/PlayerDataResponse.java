@@ -24,12 +24,12 @@ import java.util.UUID;
  * Date-created: 25/01/2016 00:00
  * Project: BubblePackets
  */
-public class PlayerDataResponse extends AbstractDataMapMessageObject implements PlayerMessage {
-    private UUID u;
+public class PlayerDataResponse extends AbstractDataMapMessageObject implements PlayerMessage{
+    private String name;
 
-    public PlayerDataResponse(UUID u, Map data) {
+    public PlayerDataResponse(String name, Map data) {
         super(data);
-        this.u = u;
+        this.name = name;
     }
 
     public PlayerDataResponse(byte[] bytes){
@@ -37,14 +37,14 @@ public class PlayerDataResponse extends AbstractDataMapMessageObject implements 
     }
 
     public void serializeInfo(ByteArrayDataInput in){
-        u = UUID.fromString(in.readUTF());
+        name = in.readUTF();
     }
 
     public void parseInfo(DataOutputStream out) throws IOException{
-        out.writeUTF(String.valueOf(u));
+        out.writeUTF(name);
     }
 
-    public UUID getUUID(){
-        return u;
+    public String getName(){
+        return name;
     }
 }

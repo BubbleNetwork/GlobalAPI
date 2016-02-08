@@ -20,5 +20,5 @@ import java.util.UUID;
  * Project: BubblePackets
  */
 public interface PlayerMessage extends IPluginMessage {
-    UUID getUUID();
+    String getName();
 }

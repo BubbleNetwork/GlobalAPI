@@ -2,11 +2,9 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging.messages.request
 
 import com.google.common.io.ByteArrayDataInput;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageObject;
-import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.PlayerMessage;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * Copyright Statement
@@ -23,12 +21,12 @@ import java.util.UUID;
  * Date-created: 25/01/2016 00:14
  * Project: BubblePackets
  */
-public class PlayerDataRequest extends AbstractMessageObject implements PlayerMessage {
-    private UUID u;
+public class PlayerDataRequest extends AbstractMessageObject{
+    private String name;
 
-    public PlayerDataRequest(UUID u){
+    public PlayerDataRequest(String name){
         super();
-        this.u = u;
+        this.name = name;
     }
 
     public PlayerDataRequest(byte[] bytes){
@@ -37,14 +35,14 @@ public class PlayerDataRequest extends AbstractMessageObject implements PlayerMe
 
 
     public void serialize(ByteArrayDataInput in) {
-        this.u = UUID.fromString(in.readUTF());
+        this.name = in.readUTF();
     }
 
     public void parse(DataOutputStream out) throws IOException {
-        out.writeUTF(String.valueOf(u));
+        out.writeUTF(name);
     }
 
-    public UUID getUUID(){
-        return u;
+    public String getName(){
+        return name;
     }
 }
