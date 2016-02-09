@@ -1,9 +1,5 @@
 package com.thebubblenetwork.api.global.data;
 
-import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
-import com.thebubblenetwork.api.global.sql.SQLUtil;
-
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -14,6 +10,7 @@ import java.util.UUID;
 public class PlayerData extends DataObject {
 
     public static final String
+            NICKNAME = "nickname",
             RANKBASE = "rank",
             STATSBASE = "stats",
             FRIENDSBASE = "friends",

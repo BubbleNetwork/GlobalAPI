@@ -5,6 +5,7 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.RankData;
 import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
+import de.mickare.xserver.util.ChatColor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -60,7 +61,7 @@ public class Rank {
 
     public String getPrefix() {
         try {
-            return getData().getString(RankData.PREFIX);
+            return ChatColor.translateAlternateColorCodes('&',getData().getString(RankData.PREFIX));
         } catch (InvalidBaseException ex) {
             return "";
         }
@@ -68,7 +69,7 @@ public class Rank {
 
     public String getSuffix() {
         try {
-            return getData().getString(RankData.SUFFIX);
+            return ChatColor.translateAlternateColorCodes('&',getData().getString(RankData.SUFFIX));
         } catch (InvalidBaseException ex) {
             return "";
         }

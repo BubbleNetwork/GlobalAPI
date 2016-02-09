@@ -38,4 +38,5 @@ public interface BubblePlayer<T> {
     void setData(Map<?,?> data);
     Map<String, Integer> getHubItems();
     Map<String, Integer> getPacks();
+    String getNickName();
 }

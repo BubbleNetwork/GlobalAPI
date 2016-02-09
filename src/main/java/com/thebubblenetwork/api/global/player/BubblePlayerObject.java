@@ -4,6 +4,7 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.PlayerData;
 import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 import com.thebubblenetwork.api.global.ranks.Rank;
+import de.mickare.xserver.util.ChatColor;
 
 import java.util.*;
 
@@ -22,7 +23,7 @@ import java.util.*;
  * Date-created: 26/01/2016 20:19
  * Project: GlobalAPI
  */
-public class BubblePlayerObject<T> implements BubblePlayer<T>{
+public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
     private static Map<UUID,BubblePlayerObject> playerObjectMap = new HashMap<>();
 
     public static BubblePlayer getObject(UUID u){
@@ -52,7 +53,7 @@ public class BubblePlayerObject<T> implements BubblePlayer<T>{
 
     public T getPlayer(){
         if(player == null){
-
+            player = (T)BubbleHubObject.getInstance().getPlayer(getUUID());
         }
         return player;
     }
@@ -155,6 +156,16 @@ public class BubblePlayerObject<T> implements BubblePlayer<T>{
         getData().getRaw().clear();
         for(Map.Entry<?,?> e: data.entrySet()){
             getData().getRaw().put(e.getKey(),e.getValue());
+        }
+    }
+
+    public abstract String getName();
+
+    public String getNickName(){
+        try {
+            return ChatColor.translateAlternateColorCodes('&',getData().getString(PlayerData.NICKNAME));
+        } catch (InvalidBaseException e) {
+            return getName();
         }
     }
 }
