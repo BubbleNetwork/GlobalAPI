@@ -79,14 +79,12 @@ public class PacketHub implements XServerListener {
     @XEventHandler
     public void onConnect(XServerLoggedInEvent e){
         if(!isValid(e.getServer()))return;
-        System.out.println("Connecting to " + constructInfo(e.getServer()));
         for(PacketListener listener:listenerSet)listener.onConnect(new PacketInfo(e.getServer(),e.getChannel()));
     }
 
     @XEventHandler
     public void onDisconnect(XServerDisconnectEvent e){
         if(!isValid(e.getServer()))return;
-        System.out.println("Disconnecting from " + constructInfo(e.getServer()));
         for(PacketListener listener:listenerSet)listener.onDisconnect(new PacketInfo(e.getServer(),e.getChannel()));
     }
 
@@ -94,7 +92,6 @@ public class PacketHub implements XServerListener {
     public void onMessage(XServerMessageIncomingEvent e){
         Message m = e.getMessage();
         if(!isValid(m.getSender()))return;
-        System.out.println("Receiving message from " + constructInfo(m.getSender()) + " in channel " + m.getSubChannel());
         MessageType type;
         try{
             Class<?> possibleclass = Class.forName(m.getSubChannel());
@@ -119,6 +116,6 @@ public class PacketHub implements XServerListener {
     }
 
     public boolean isValid(XServer server){
-        return server != currentserver;
+        return server != currentserver && !server.getName().equals(currentserver.getName());
     }
 }
