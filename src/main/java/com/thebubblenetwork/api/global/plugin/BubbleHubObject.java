@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
  * Date-created: 26/01/2016 20:28
  * Project: GlobalAPI
  */
-public abstract class BubbleHubObject<PLUGIN,PLAYER> implements BubbleHub<PLUGIN,PLAYER>{
-    private static BubbleHub<?,?> instance;
+public abstract class BubbleHubObject<P> implements BubbleHub<P>{
+    private static BubbleHub<?> instance;
 
     public static BubbleHub getInstance(){
         return instance;

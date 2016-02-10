@@ -51,9 +51,10 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return data;
     }
 
+    @SuppressWarnings("unchecked")
     public T getPlayer(){
         if(player == null){
-            player = (T)BubbleHubObject.getInstance().getPlayer(getUUID());
+            player = (T)(BubbleHubObject.getInstance().getPlayer(getUUID()));
         }
         return player;
     }
@@ -152,9 +153,9 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return getRank().isAuthorized(permission);
     }
 
-    public void setData(Map<?,?> data) {
+    public void setData(Map<String,String> data) {
         getData().getRaw().clear();
-        for(Map.Entry<?,?> e: data.entrySet()){
+        for(Map.Entry<String,String> e: data.entrySet()){
             getData().getRaw().put(e.getKey(),e.getValue());
         }
     }
@@ -162,10 +163,12 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
     public abstract String getName();
 
     public String getNickName(){
+        String nick;
         try {
-            return ChatColor.translateAlternateColorCodes('&',getData().getString(PlayerData.NICKNAME));
+            nick = getData().getString(PlayerData.NICKNAME);
         } catch (InvalidBaseException e) {
             return getName();
         }
+        return ChatColor.translateAlternateColorCodes('&',nick);
     }
 }

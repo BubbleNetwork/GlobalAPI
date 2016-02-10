@@ -16,10 +16,10 @@ import java.util.*;
  */
 public class DataObject {
 
-    private Map data;
+    private Map<String,String> data;
 
 
-    public DataObject(Map data) {
+    public DataObject(Map<String,String> data) {
         this.data = data;
     }
 
@@ -32,7 +32,7 @@ public class DataObject {
         return datamap;
     }
 
-    public Map getRaw() {
+    public Map<String,String> getRaw() {
         return data;
     }
 
@@ -53,16 +53,14 @@ public class DataObject {
     }
 
     public String getString(String indentifier) throws InvalidBaseException {
-        check(indentifier, String.class);
-        return (String) getRaw().get(indentifier);
+        check(indentifier);
+        return getRaw().get(indentifier);
     }
 
 
-    protected void check(String indentifier, Class cast) throws InvalidBaseException {
+    protected void check(String indentifier) throws InvalidBaseException {
         if (!getRaw().containsKey(indentifier))
             throw new InvalidBaseException("Could not find raw data: " + indentifier);
-        if (!cast.isInstance(getRaw().get(indentifier)))
-            throw new InvalidBaseException("Data could not be cast to: " + cast.getName());
     }
 
     @SuppressWarnings("unchecked")
@@ -81,21 +79,17 @@ public class DataObject {
             else set.deleteRow();
         }
         set.close();
-        Map.Entry entry;
-        Iterator<Map.Entry> entryIterator = getRaw().entrySet().iterator();
-        while(entryIterator.hasNext()){
-            entry = entryIterator.next();
-            Object keyobject = entry.getKey();
-            Object valueobject = entry.getValue();
-            String keystring = keyobject instanceof String ? (String)keyobject : String.valueOf(keyobject);
+        for (Map.Entry<String,String> entry:getRaw().entrySet()){
+            String keystring = entry.getKey();
+            String valuestring = entry.getValue();
             if(update.contains(keystring)){
-                SQLUtil.update(connection,table,"value",valueobject,new SQLUtil.Where(keyname + "\" AND `key`=\"" + keyobject + "\""));
+                SQLUtil.update(connection,table,"value",valuestring,new SQLUtil.Where(keyname + "\" AND `key`=\"" + keystring + "\""));
             }
             else if(!proccessed.contains(keystring)){
                 SQLUtil.execute(connection,table,new ImmutableMap.Builder<String,Object>()
                         .put(key,keyname)
-                        .put("key",keyobject)
-                        .put("value",valueobject)
+                        .put("key",keystring)
+                        .put("value",keystring)
                         .build());
             }
         }

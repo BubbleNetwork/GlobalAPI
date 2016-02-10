@@ -21,5 +21,5 @@ import java.util.Map;
  * Project: BubblePackets
  */
 public interface DataMessage extends IPluginMessage {
-    Map<?,?> getData();
+    Map<String,String> getData();
 }

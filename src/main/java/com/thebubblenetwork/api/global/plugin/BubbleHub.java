@@ -23,9 +23,9 @@ import java.util.UUID;
  * Date-created: 26/01/2016 20:25
  * Project: GlobalAPI
  */
-public interface BubbleHub<PLUGIN,PLAYER>{
-    PLUGIN getPlugin();
-    PLAYER getPlayer(UUID u);
+public interface BubbleHub<P>{
+    P getPlugin();
+    Object getPlayer(UUID u);
     SQLConnection getConnection();
     PropertiesFile getSQLProperties();
     PacketHub getPacketHub();

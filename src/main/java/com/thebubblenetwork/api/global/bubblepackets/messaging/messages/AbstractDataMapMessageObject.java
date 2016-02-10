@@ -2,6 +2,7 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging.messages;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageObject;
+import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 
 import java.io.*;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.Map;
  * Project: BubblePackets
  */
 public abstract class AbstractDataMapMessageObject extends AbstractMessageObject implements DataMessage{
-    private Map data;
+    private Map<String,String> data;
 
     public AbstractDataMapMessageObject(Map data) {
         this.data = data;
@@ -37,86 +38,25 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
         serializeInfo(in);
         int size = in.readInt();
         data = new HashMap<>();
-        while(data.size() < size){
-            int datasize = in.readInt();
-            byte[] keybyte = new byte[datasize];
-            for(int temp = 0;temp < datasize;temp++){
-                keybyte[temp] = in.readByte();
-            }
-            datasize = in.readInt();
-            byte[] valuebyte = new byte[datasize];
-            for(int temp = 0;temp < datasize;temp++){
-                valuebyte[temp] = in.readByte();
-            }
+        for(int done = 0;done < size;done++){
             try {
-                Object key = getObject(keybyte);
-                Object value = getBytes(valuebyte);
+                String key = in.readUTF();
+                String value = in.readUTF();
                 data.put(key,value);
             } catch (Exception e) {
-                //Automatic Catch Statement
-                e.printStackTrace();
+                BubbleHubObject.getInstance().logSevere(e.getMessage());
+                BubbleHubObject.getInstance().logSevere("Failed to proccess map object");
+                break;
             }
         }
     }
-
-    public byte[] getBytes(Object o) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput out = null;
-        try {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(o);
-            return bos.toByteArray();
-        }
-        finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-            try {
-                bos.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-        }
-    }
-
-    public Object getObject(byte[] bytes) throws Exception{
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        ObjectInput in = null;
-        try {
-            in = new ObjectInputStream(bis);
-            return in.readObject();
-        }
-        finally {
-            try {
-                bis.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-        }}
 
     public void parse(DataOutputStream out) throws IOException {
         parseInfo(out);
-        out.writeInt(data.size());
-        for(Map.Entry entry:getData().entrySet()){
-            Object key = entry.getKey();
-            byte[] keybytes = getBytes(key);
-            out.writeInt(keybytes.length);
-            for(byte b:keybytes)out.writeByte(b);
-            Object value = entry.getValue();
-            byte[] valuebytes = getBytes(value);
-            out.writeInt(valuebytes.length);
-            for(byte b:valuebytes)out.writeByte(b);
+        out.writeInt(getData().size());
+        for(Map.Entry<String,String> entry:getData().entrySet()){
+            out.writeUTF(entry.getKey());
+            out.writeUTF(entry.getValue());
         }
     }
 
@@ -124,7 +64,7 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
 
     public abstract void parseInfo(DataOutputStream out) throws IOException;
 
-    public Map<?,?> getData(){
+    public Map<String,String> getData(){
         return data;
     }
 }

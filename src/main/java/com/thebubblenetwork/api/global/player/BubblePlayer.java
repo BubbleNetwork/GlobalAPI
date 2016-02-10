@@ -35,7 +35,7 @@ public interface BubblePlayer<T> {
     UUID[] getFriends();
     UUID[] getFriendIncomingRequests();
     UUID[] getFriendOutgoingRequests();
-    void setData(Map<?,?> data);
+    void setData(Map<String,String> data);
     Map<String, Integer> getHubItems();
     Map<String, Integer> getPacks();
     String getNickName();

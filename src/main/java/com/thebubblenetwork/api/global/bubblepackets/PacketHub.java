@@ -31,7 +31,7 @@ import java.util.Set;
  * Project: BubblePackets
  */
 public class PacketHub implements XServerListener {
-    private BubbleHub<?,?> plugin;
+    private BubbleHub<?> plugin;
     private AbstractXServerManager manager;
     private XServer currentserver;
 
@@ -40,7 +40,7 @@ public class PacketHub implements XServerListener {
     public PacketHub(){
     }
 
-    public void register(BubbleHub<?,?> plugin){
+    public void register(BubbleHub<?> plugin){
         this.plugin = plugin;
         try {
             manager = XServerManager.getInstance();
@@ -53,7 +53,7 @@ public class PacketHub implements XServerListener {
         currentserver = manager.getHomeServer();
     }
 
-    private void findHard(BubbleHub<?,?> plugin){
+    private void findHard(BubbleHub<?> plugin){
         plugin.logInfo("Could not find XServer instance, using plugin dependency");
         try {
             manager = plugin.getXPlugin().getManager();
