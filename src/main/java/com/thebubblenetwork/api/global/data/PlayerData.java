@@ -18,13 +18,12 @@ public class PlayerData extends DataObject {
             PACKS = "packs",
             KITBASE = "kits",
             CURRENCYBASE = "currency",
+            NAME = "name",
             TOKENS = "tokens",
-            CRYSTALS = "crystals",
             MAINRANK = RANKBASE + ".mainrank",
             SUBRANKS = RANKBASE + ".subranks",
             FRIENDSLIST = FRIENDSBASE + ".current",
-            FRIENDINCOMINGRQ = FRIENDSBASE + ".incoming",
-            FRIENDOUTGOINGRQ = FRIENDSBASE + ".outgoing";
+            FRIENDINCOMINGRQ = FRIENDSBASE + ".incoming";
 
     public static String table = "playerdata";
 

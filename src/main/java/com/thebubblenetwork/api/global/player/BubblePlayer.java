@@ -43,9 +43,6 @@ public interface BubblePlayer<T> {
     UUID[] getFriendIncomingRequests();
     void setFriendsIncomingRequests(UUID... friends);
     void setFriendsIncomingRequests(Iterable<UUID> friends);
-    UUID[] getFriendOutgoingRequests();
-    void setFriendsOutgoingRequests(UUID... friends);
-    void setFriendsOutgoingRequests(Iterable<UUID> friends);
     void setData(Map<String,String> data);
     Map<String, Integer> getHubItems();
     void setHubItem(String item,int id);

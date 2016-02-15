@@ -111,14 +111,6 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         }
     }
 
-    public UUID[] getFriendOutgoingRequests() {
-        try {
-            return getData().getUUIDList(PlayerData.FRIENDOUTGOINGRQ);
-        } catch (InvalidBaseException e) {
-            return new UUID[0];
-        }
-    }
-
     public Map<String, Integer> getStats(String game) {
         return getData().getMap(PlayerData.STATSBASE, game);
     }
@@ -194,14 +186,6 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
 
     public void setFriendsIncomingRequests(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDINCOMINGRQ,toStrings(friends));
-    }
-
-    public void setFriendsOutgoingRequests(UUID... friends) {
-        setFriendsOutgoingRequests(Arrays.asList(friends));
-    }
-
-    public void setFriendsOutgoingRequests(Iterable<UUID> friends) {
-        setList(PlayerData.FRIENDOUTGOINGRQ,toStrings(friends));
     }
 
     private Set<String> toStrings(Iterable<?> objects){
