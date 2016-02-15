@@ -91,6 +91,11 @@ public class Rank {
         }
     }
 
+    @Override
+    public String toString(){
+        return getName();
+    }
+
     public Rank getInheritance() {
         return ranks.get(getInheritanceString());
     }

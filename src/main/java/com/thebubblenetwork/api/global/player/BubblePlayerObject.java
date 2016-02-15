@@ -1,5 +1,6 @@
 package com.thebubblenetwork.api.global.player;
 
+import com.google.common.base.Joiner;
 import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.PlayerData;
 import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
@@ -139,11 +140,6 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return getData().getMapRaw(PlayerData.CURRENCYBASE);
     }
 
-    public int getCrystals(){
-        Map<String, Integer> currency = getCurrency();
-        return currency.containsKey(PlayerData.CRYSTALS) ? currency.get(PlayerData.CRYSTALS) : 0;
-    }
-
     public int getTokens() {
         Map<String, Integer> currency = getCurrency();
         return currency.containsKey(PlayerData.TOKENS) ? currency.get(PlayerData.TOKENS) : 0;
@@ -158,6 +154,76 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         for(Map.Entry<String,String> e: data.entrySet()){
             getData().getRaw().put(e.getKey(),e.getValue());
         }
+    }
+
+    public void setRank(Rank rank) {
+        getData().set(PlayerData.MAINRANK,rank.getName());
+    }
+
+    public void setSubRanks(Rank... subRanks) {
+        setSubRanks(Arrays.asList(subRanks));
+    }
+
+    public void setSubRanks(Iterable<Rank> subRanks) {
+        setList(PlayerData.SUBRANKS,toStrings(subRanks));
+    }
+
+    public void setTokens(int tokens) {
+        getData().set(PlayerData.TOKENS,tokens);
+    }
+
+    public void setStat(String game, String indentifier, int id) {
+        getData().set(PlayerData.STATSBASE + "." + game + "." + indentifier,id);
+    }
+
+    public void setKit(String game, String indentifier, int id) {
+        getData().set(PlayerData.KITBASE + "." + game + "." + indentifier,id);
+    }
+
+    public void setFriends(UUID... friends) {
+        setFriends(Arrays.asList(friends));
+    }
+
+    public void setFriends(Iterable<UUID> friends) {
+        setList(PlayerData.FRIENDSLIST,toStrings(friends));
+    }
+
+    public void setFriendsIncomingRequests(UUID... friends) {
+        setFriendsIncomingRequests(Arrays.asList(friends));
+    }
+
+    public void setFriendsIncomingRequests(Iterable<UUID> friends) {
+        setList(PlayerData.FRIENDINCOMINGRQ,toStrings(friends));
+    }
+
+    public void setFriendsOutgoingRequests(UUID... friends) {
+        setFriendsOutgoingRequests(Arrays.asList(friends));
+    }
+
+    public void setFriendsOutgoingRequests(Iterable<UUID> friends) {
+        setList(PlayerData.FRIENDOUTGOINGRQ,toStrings(friends));
+    }
+
+    private Set<String> toStrings(Iterable<?> objects){
+        Set<String> set = new HashSet<>();
+        for(Object o:objects)set.add(o.toString());
+        return set;
+    }
+
+    private void setList(String base, Iterable<String> friends){
+        getData().set(base, Joiner.on(",").join(friends));
+    }
+
+    public void setHubItem(String item, int id) {
+        getData().set(PlayerData.ITEMSBASE + ".item",id);
+    }
+
+    public void setPacks(String pack, int amount) {
+        getData().set(PlayerData.PACKS + "." + pack,amount);
+    }
+
+    public void setNick(String nick) {
+        getData().set(PlayerData.NICKNAME,nick);
     }
 
     public abstract String getName();

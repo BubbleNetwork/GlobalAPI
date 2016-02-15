@@ -48,9 +48,14 @@ public class PacketHub implements XServerListener {
         catch (NotInitializedException ex){
             findHard(plugin);
         }
-        if(manager == null)findHard(plugin);
         manager.getEventHandler().registerListenerUnsafe(plugin.getPlugin(),this);
         currentserver = manager.getHomeServer();
+        //Setting up fakeservers
+        for(XServer server:getManager().getServers()){
+            if(isValid(server)){
+                onConnect(new XServerLoggedInEvent(server));
+            }
+        }
     }
 
     private void findHard(BubbleHub<?> plugin){
@@ -66,6 +71,10 @@ public class PacketHub implements XServerListener {
 
     public void sendMessage(XServer server,IPluginMessage message) throws IOException{
         server.sendMessage(manager.createMessage(message.getType().getName(),message.getBytes()));
+    }
+
+    public void unregisterThis(){
+        getManager().getEventHandler().unregisterListener(this);
     }
 
     public void registerListener(PacketListener listener){
@@ -117,5 +126,13 @@ public class PacketHub implements XServerListener {
 
     public boolean isValid(XServer server){
         return server != currentserver && !server.getName().equals(currentserver.getName());
+    }
+
+    public XServer getCurrentserver() {
+        return currentserver;
+    }
+
+    public AbstractXServerManager getManager() {
+        return manager;
     }
 }

@@ -3,9 +3,11 @@ package com.thebubblenetwork.api.global.plugin;
 import com.google.common.collect.ImmutableMap;
 import com.thebubblenetwork.api.global.bubblepackets.PacketHub;
 import com.thebubblenetwork.api.global.file.PropertiesFile;
+import com.thebubblenetwork.api.global.plugin.updater.FileUpdater;
+import com.thebubblenetwork.api.global.plugin.updater.SQLUpdater;
+import com.thebubblenetwork.api.global.plugin.updater.Updatetask;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
-import com.thebubblenetwork.api.global.type.ServerType;
 import com.thebubblenetwork.api.global.type.ServerTypeObject;
 
 import java.io.File;
@@ -13,7 +15,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.AbstractMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,10 +46,36 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
     private PropertiesFile sqlproperties;
     private SQLConnection connection;
     private PacketHub hub;
+    private Set<FileUpdater> fileupdaters = new HashSet<>();
+    private Set<SQLUpdater> sqlUpdaters = new HashSet<>();
 
     public BubbleHubObject(){
         logInfo("Assigning instance...");
         instance = this;
+        addUpdater(this);
+        addUpdater(new SQLUpdater() {
+            @Override
+            public void update(SQLConnection connection) throws SQLException, ClassNotFoundException {
+                ResultSet set = SQLUtil.query(getConnection(),"servertypes","*",new SQLUtil.Where("1"));
+                final Set<ServerTypeObject> serverTypeObjects = new HashSet<>();
+                while(set.next()){
+                    serverTypeObjects.add(new ServerTypeObject(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer")));
+                }
+                set.close();
+                runTaskLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ServerTypeObject.getTypes().clear();
+                        ServerTypeObject.getTypes().addAll(serverTypeObjects);
+                    }
+                },0L,TimeUnit.MILLISECONDS);
+            }
+
+            @Override
+            public String getName() {
+                return "ServerTypeUpdater";
+            }
+        });
     }
 
     public final void onEnable(){
@@ -75,6 +105,63 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         },
         bungee() ? 1L : 0L,
         TimeUnit.SECONDS);
+
+        logInfo("Finding updates table");
+
+        try{
+            if(!SQLUtil.tableExists(getConnection(),"updates")){
+                logInfo("Creating updates table");
+                SQLUtil.createTable(getConnection(),"updates",
+                        new ImmutableMap.Builder<String,Map.Entry<SQLUtil.SQLDataType,Integer>>()
+                                .put("artifact",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,32))
+                                .put("version",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.INT,3))
+                                .put("url", new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,-1))
+                                .build());
+            }
+        }
+        catch (SQLException|ClassNotFoundException ex){
+            logSevere(ex.getMessage());
+            logSevere("Error creating updates table");
+        }
+
+
+        runTaskLater(new Runnable() {
+            public void run() {
+                try {
+                    new Updatetask<P>(getConnection(), "updates", fileupdaters, sqlUpdaters){
+                        String name = getName();
+
+                        public void logInfo(String s){
+                            System.out.println("[" + name + "] " + s);
+                        }
+
+                        public void logSevere(String s){
+                            System.err.println("[" + name + "] " + s);
+                        }
+
+                        public void update(Runnable r) {
+                            BubbleHubObject.this.update(r);
+                        }
+
+                        public Plugman<P> getPlugman() {
+                            return BubbleHubObject.this.getPlugman();
+                        }
+
+                        public P getPlugin() {
+                            return BubbleHubObject.this.getPlugin();
+                        }
+
+                        public File getFile() {
+                            return getReplace();
+                        }
+                    };
+                } catch (Exception e) {
+                    logSevere(e.getMessage());
+                    logSevere("Error running updater");
+                }
+                runTaskLater(this,5L,TimeUnit.MINUTES);
+            }
+        },30L,TimeUnit.SECONDS);
     }
 
     public final void onDisable(){
@@ -90,6 +177,19 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         } catch (SQLException e) {
             logSevere(e.getMessage());
             logSevere("Could not close SQL connection");
+        }
+
+        getPacketHub().unregisterThis();
+
+        if(Updatetask.instance != null){
+            try {
+                Updatetask.instance.interrupt();
+            } catch (Exception e) {
+                logSevere(e.getMessage());
+                logSevere(e.getClass().getName());
+                logSevere("Could not interrupt updatetask thread");
+            }
+            Updatetask.instance = null;
         }
     }
 
@@ -207,6 +307,15 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         return hub;
     }
 
+    public void addUpdater(FileUpdater updater) {
+        fileupdaters.add(updater);
+    }
+
+    public void addUpdater(SQLUpdater updater) {
+        sqlUpdaters.add(updater);
+    }
+
+    public abstract void update(Runnable r);
     public abstract boolean bungee();
     public abstract void runTaskLater(Runnable r,long l,TimeUnit timeUnit);
     public abstract void saveXServerDefaults();

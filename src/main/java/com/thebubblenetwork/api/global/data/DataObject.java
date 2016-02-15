@@ -94,4 +94,12 @@ public class DataObject {
             }
         }
     }
+
+    public void set(String s,String s2){
+        getRaw().put(s,s2);
+    }
+
+    public void set(String s,int i){
+        getRaw().put(s,String.valueOf(i));
+    }
 }
