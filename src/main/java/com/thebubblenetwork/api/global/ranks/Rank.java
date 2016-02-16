@@ -5,6 +5,7 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.RankData;
 import de.mickare.xserver.util.ChatColor;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,7 +13,7 @@ import java.util.Set;
  * Created by Jacob on 31/12/2015.
  */
 public class Rank {
-    private static Set<Rank> ranks;
+    private static Set<Rank> ranks = new HashSet<>();
 
     public static Set<Rank> getRanks() {
         return ranks;
@@ -42,31 +43,60 @@ public class Rank {
         return null;
     }
 
-    public static void loadRank(String name,Map map){
-        if(getRank(name) != null)throw new IllegalArgumentException("Rank already exists");
+    public static void loadRank(String name,Map<String,String> map){
+        Rank r;
+        if((r = getRank(name)) != null){
+            if(map == null){
+                ranks.remove(r);
+            }
+            else{
+                r.getData().getRaw().clear();
+                for(Map.Entry<String,String> entry:map.entrySet()){
+                    r.getData().getRaw().put(entry.getKey(),entry.getValue());
+                }
+            }
+        }
         ranks.add(new Rank(name,new RankData(map)));
     }
 
     private static boolean isAuthorized(Rank r, String indentifier) {
-        boolean b = isAuthorizedPrimative(r,indentifier);
-        String currentlytesting = "*";
-        String[] split = indentifier.split(".");
-        int i = 0;
-        while(!b && i < split.length){
-            b = isAuthorizedPrimative(r,currentlytesting);
-            if(currentlytesting.equalsIgnoreCase(indentifier))break;
-            currentlytesting = currentlytesting.replace("*",split[i] + ".*");
-            i++;
+        try{
+            return isAuthorizedPrimative(r,indentifier).decision();
         }
-        return b || (r.getInheritance() != null && isAuthorized(r.getInheritance(), indentifier));
+        catch (UnsupportedOperationException e1){
+            try {
+                return isAuthorizedPrimative(r, "*").decision();
+            }
+            catch (UnsupportedOperationException e2){
+                return r.getInheritance() != null && isAuthorized(r,indentifier);
+            }
+        }
     }
 
-    private static boolean isAuthorizedPrimative(Rank r, String indentifier){
+    private static Decision isAuthorizedPrimative(Rank r, String indentifier){
+        Decision d;
         try {
-            return r.getData().getBoolean(indentifier);
-        } catch (InvalidBaseException e) {
+            d = Decision.getDecision(r.getData().getBoolean(indentifier));
+        } catch (Exception e) {
+            d = Decision.CONTINUE;
         }
-        return false;
+        System.out.println("[Permissions] [Debug] " + r.getName() + " has " + d.toString() + " for " + indentifier);
+        return d;
+    }
+
+    enum Decision{
+        CONTINUE(),TRUE(),FALSE();
+
+        static Decision getDecision(boolean b){
+            if(b)return TRUE;
+            return FALSE;
+        }
+
+        boolean decision(){
+            if(this == TRUE)return true;
+            if(this == FALSE)return false;
+            throw new UnsupportedOperationException();
+        }
     }
 
 

@@ -25,7 +25,7 @@ import java.util.Map;
 public class RankDataUpdate extends AbstractDataMapMessageObject {
     private String name;
 
-    public RankDataUpdate(String name,Map map) {
+    public RankDataUpdate(String name,Map<String,String> map) {
         super(map);
         this.name = name;
     }

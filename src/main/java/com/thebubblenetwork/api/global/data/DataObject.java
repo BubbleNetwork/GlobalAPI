@@ -74,18 +74,21 @@ public class DataObject {
             stringSet.add("('" + object + "','" + stringEntry.getKey() + "','" + stringEntry.getValue() + "')");
         }
         String insert = Joiner.on(",").join(stringSet) + ";";
-        connection.executeSQL(preset + insert);
+        if(stringSet.size() > 0)connection.executeSQL(preset + insert);
     }
 
     public void set(String s,String s2){
-        getRaw().put(s,s2);
+        if(s2 == null)getRaw().remove(s);
+        else getRaw().put(s,s2);
     }
 
-    public void set(String s,int i){
-        getRaw().put(s,String.valueOf(i));
+    public void set(String s,Integer i){
+        if(i == null)getRaw().remove(s);
+        else getRaw().put(s,String.valueOf(i));
     }
 
-    public void set(String s,boolean b){
-        getRaw().put(s,String.valueOf(b));
+    public void set(String s,Boolean b){
+        if(b == null)getRaw().remove(s);
+        else getRaw().put(s,String.valueOf(b));
     }
 }

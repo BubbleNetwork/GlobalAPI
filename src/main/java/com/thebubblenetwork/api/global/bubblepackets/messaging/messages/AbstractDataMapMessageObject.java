@@ -37,26 +37,34 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
     public void serialize(ByteArrayDataInput in) {
         serializeInfo(in);
         int size = in.readInt();
-        data = new HashMap<>();
-        for(int done = 0;done < size;done++){
-            try {
-                String key = in.readUTF();
-                String value = in.readUTF();
-                data.put(key,value);
-            } catch (Exception e) {
-                BubbleHubObject.getInstance().logSevere(e.getMessage());
-                BubbleHubObject.getInstance().logSevere("Failed to proccess map object");
-                break;
+        if(size == -1)data = null;
+        else {
+            data = new HashMap<>();
+            for (int done = 0; done < size; done++) {
+                try {
+                    String key = in.readUTF();
+                    String value = in.readUTF();
+                    data.put(key, value);
+                } catch (Exception e) {
+                    BubbleHubObject.getInstance().logSevere(e.getMessage());
+                    BubbleHubObject.getInstance().logSevere("Failed to proccess map object");
+                    break;
+                }
             }
         }
     }
 
     public void parse(DataOutputStream out) throws IOException {
         parseInfo(out);
-        out.writeInt(getData().size());
-        for(Map.Entry<String,String> entry:getData().entrySet()){
-            out.writeUTF(entry.getKey());
-            out.writeUTF(entry.getValue());
+        if(getData() == null){
+            out.writeInt(-1);
+        }
+        else {
+            out.writeInt(getData().size());
+            for (Map.Entry<String, String> entry : getData().entrySet()) {
+                out.writeUTF(entry.getKey());
+                out.writeUTF(entry.getValue());
+            }
         }
     }
 

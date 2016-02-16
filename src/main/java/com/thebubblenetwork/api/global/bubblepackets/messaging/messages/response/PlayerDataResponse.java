@@ -27,7 +27,7 @@ import java.util.UUID;
 public class PlayerDataResponse extends AbstractDataMapMessageObject implements PlayerMessage{
     private String name;
 
-    public PlayerDataResponse(String name, Map data) {
+    public PlayerDataResponse(String name, Map<String,String> data) {
         super(data);
         this.name = name;
     }
