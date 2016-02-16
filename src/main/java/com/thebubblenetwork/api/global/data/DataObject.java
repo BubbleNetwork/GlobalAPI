@@ -1,5 +1,6 @@
 package com.thebubblenetwork.api.global.data;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
@@ -64,35 +65,16 @@ public class DataObject {
     }
 
     @SuppressWarnings("unchecked")
-    public void save(String table,String key,Object keyname) throws SQLException,ClassNotFoundException{
+    public void save(String table,String var,Object object) throws SQLException,ClassNotFoundException{
         SQLConnection connection = BubbleHubObject.getInstance().getConnection();
-        ResultSet set = SQLUtil.query(connection,table,"*",new SQLUtil.WhereVar(key,keyname));
-        Set<String> proccessed = new HashSet<>();
-        Set<String> update = new HashSet<>();
-        while(set.next()){
-            String keyobject = set.getString("key");
-            String valueobject = set.getString("value");
-            if(getRaw().containsKey(keyobject)){
-                if(getRaw().get(keyobject).equals(valueobject))proccessed.add(keyobject);
-                else update.add(keyobject);
-            }
-            else set.deleteRow();
+        connection.executeSQL("DELETE FROM `" + table + "` WHERE " + new SQLUtil.WhereVar(var,object).getWhere());
+        String preset = "INSERT INTO `" + table + "` (`" + var + "`,`key`,`value`) VALUES ";
+        Set<String> stringSet = new HashSet<>();
+        for(Map.Entry<String,String> stringEntry:getRaw().entrySet()){
+            stringSet.add("('" + object + "','" + stringEntry.getKey() + "','" + stringEntry.getValue() + "')");
         }
-        set.close();
-        for (Map.Entry<String,String> entry:getRaw().entrySet()){
-            String keystring = entry.getKey();
-            String valuestring = entry.getValue();
-            if(update.contains(keystring)){
-                SQLUtil.update(connection,table,"value",valuestring,new SQLUtil.Where(keyname + "\" AND `key`=\"" + keystring + "\""));
-            }
-            else if(!proccessed.contains(keystring)){
-                SQLUtil.execute(connection,table,new ImmutableMap.Builder<String,Object>()
-                        .put(key,keyname)
-                        .put("key",keystring)
-                        .put("value",keystring)
-                        .build());
-            }
-        }
+        String insert = Joiner.on(",").join(stringSet) + ";";
+        connection.executeSQL(preset + insert);
     }
 
     public void set(String s,String s2){
@@ -101,5 +83,9 @@ public class DataObject {
 
     public void set(String s,int i){
         getRaw().put(s,String.valueOf(i));
+    }
+
+    public void set(String s,boolean b){
+        getRaw().put(s,String.valueOf(b));
     }
 }

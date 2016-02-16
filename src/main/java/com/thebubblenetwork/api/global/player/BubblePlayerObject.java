@@ -146,10 +146,12 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         for(Map.Entry<String,String> e: data.entrySet()){
             getData().getRaw().put(e.getKey(),e.getValue());
         }
+        update();
     }
 
     public void setRank(Rank rank) {
         getData().set(PlayerData.MAINRANK,rank.getName());
+        update();
     }
 
     public void setSubRanks(Rank... subRanks) {
@@ -158,18 +160,22 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
 
     public void setSubRanks(Iterable<Rank> subRanks) {
         setList(PlayerData.SUBRANKS,toStrings(subRanks));
+        update();
     }
 
     public void setTokens(int tokens) {
         getData().set(PlayerData.TOKENS,tokens);
+        update();
     }
 
     public void setStat(String game, String indentifier, int id) {
         getData().set(PlayerData.STATSBASE + "." + game + "." + indentifier,id);
+        update();
     }
 
     public void setKit(String game, String indentifier, int id) {
         getData().set(PlayerData.KITBASE + "." + game + "." + indentifier,id);
+        update();
     }
 
     public void setFriends(UUID... friends) {
@@ -178,6 +184,7 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
 
     public void setFriends(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDSLIST,toStrings(friends));
+        update();
     }
 
     public void setFriendsIncomingRequests(UUID... friends) {
@@ -186,6 +193,7 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
 
     public void setFriendsIncomingRequests(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDINCOMINGRQ,toStrings(friends));
+        update();
     }
 
     private Set<String> toStrings(Iterable<?> objects){
@@ -200,17 +208,18 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
 
     public void setHubItem(String item, int id) {
         getData().set(PlayerData.ITEMSBASE + ".item",id);
+        update();
     }
 
     public void setPacks(String pack, int amount) {
         getData().set(PlayerData.PACKS + "." + pack,amount);
+        update();
     }
 
     public void setNick(String nick) {
         getData().set(PlayerData.NICKNAME,nick);
+        update();
     }
-
-    public abstract String getName();
 
     public String getNickName(){
         String nick;
@@ -220,5 +229,10 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
             return getName();
         }
         return ChatColor.translateAlternateColorCodes('&',nick);
+    }
+
+
+    public void update(){
+
     }
 }

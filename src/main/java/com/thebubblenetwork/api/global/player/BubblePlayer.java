@@ -23,6 +23,7 @@ import java.util.UUID;
  */
 public interface BubblePlayer<T> {
     PlayerData getData();
+    String getName();
     T getPlayer();
     Rank getRank();
     void setRank(Rank rank);

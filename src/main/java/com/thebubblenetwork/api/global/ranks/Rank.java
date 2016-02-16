@@ -3,12 +3,8 @@ package com.thebubblenetwork.api.global.ranks;
 import com.google.common.collect.Iterables;
 import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.RankData;
-import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
-import com.thebubblenetwork.api.global.sql.SQLUtil;
 import de.mickare.xserver.util.ChatColor;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,16 +43,34 @@ public class Rank {
     }
 
     private static boolean isAuthorized(Rank r, String indentifier) {
-        boolean b = false;
-        try {
-            b = r.getData().getBoolean(indentifier);
-        } catch (InvalidBaseException e) {
+        boolean b = isAuthorizedPrimative(r,indentifier);
+        String currentlytesting = "*";
+        String[] split = indentifier.split(".");
+        int i = 0;
+        while(!b && i < split.length){
+            b = isAuthorizedPrimative(r,currentlytesting);
+            if(currentlytesting.equalsIgnoreCase(indentifier))break;
+            currentlytesting = currentlytesting.replace("*",split[i] + ".*");
+            i++;
         }
         return b || (r.getInheritance() != null && isAuthorized(r.getInheritance(), indentifier));
     }
 
+    private static boolean isAuthorizedPrimative(Rank r, String indentifier){
+        try {
+            return r.getData().getBoolean(indentifier);
+        } catch (InvalidBaseException e) {
+        }
+        return false;
+    }
+
+
     public String getName() {
         return name;
+    }
+
+    public void setPrefix(String s){
+        getData().set(RankData.PREFIX,s);
     }
 
     public String getPrefix() {
@@ -65,6 +79,10 @@ public class Rank {
         } catch (InvalidBaseException ex) {
             return "";
         }
+    }
+
+    public void setSuffix(String s){
+        getData().set(RankData.SUFFIX,s);
     }
 
     public String getSuffix() {
@@ -94,6 +112,10 @@ public class Rank {
     @Override
     public String toString(){
         return getName();
+    }
+
+    public void setInheritance(Rank r){
+        getData().set(RankData.INHERITANCE,r == null ? null : r.getName());
     }
 
     public Rank getInheritance() {
