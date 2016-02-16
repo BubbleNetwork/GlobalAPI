@@ -5,16 +5,16 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.RankData;
 import de.mickare.xserver.util.ChatColor;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Jacob on 31/12/2015.
  */
 public class Rank {
-    private static Map<String, Rank> ranks = new HashMap<>();
+    private static Set<Rank> ranks;
 
-    public static Map<String, Rank> getRanks() {
+    public static Set<Rank> getRanks() {
         return ranks;
     }
 
@@ -26,20 +26,25 @@ public class Rank {
         this.data = data;
     }
 
+
     public static Rank getDefault() {
-        for (Rank r : ranks.values())
+        for (Rank r : getRanks())
             if (r.isDefault())
                 return r;
         Rank r;
-        return (r = ranks.get("default")) != null ? r : ranks.size() > 0 ? Iterables.get(ranks.values(), 0) : null;
+        return (r = getRank("default")) != null ? r : ranks.size() > 0 ? Iterables.get(ranks, 0) : null;
     }
 
     public static Rank getRank(String s) {
-        return ranks.get(s);
+        for(Rank r:getRanks()){
+            if(r.getName().equalsIgnoreCase(s))return r;
+        }
+        return null;
     }
 
     public static void loadRank(String name,Map map){
-        ranks.put(name,new Rank(name,new RankData(map)));
+        if(getRank(name) != null)throw new IllegalArgumentException("Rank already exists");
+        ranks.add(new Rank(name,new RankData(map)));
     }
 
     private static boolean isAuthorized(Rank r, String indentifier) {
@@ -119,7 +124,7 @@ public class Rank {
     }
 
     public Rank getInheritance() {
-        return ranks.get(getInheritanceString());
+        return getRank(getInheritanceString());
     }
 
     public boolean isAuthorized(String indentifier) {
