@@ -1,8 +1,6 @@
 package com.thebubblenetwork.api.global.data;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Jacob on 31/12/2015.
@@ -27,19 +25,21 @@ public class PlayerData extends DataObject {
 
     public static String table = "playerdata";
 
-    public PlayerData(Map loaded) {
+    public PlayerData(Map<String,String> loaded) {
         super(loaded);
     }
 
     public UUID[] getUUIDList(String indentifier) throws InvalidBaseException{
         String[] list = getString(indentifier).split(",");
-        UUID[] uuids = new UUID[list.length];
-        int i = 0;
+        Set<UUID> uuids = new HashSet<>();
         for(String s:list){
-            uuids[i] = UUID.fromString(s);
-            i++;
+            try {
+                uuids.add(UUID.fromString(s));
+            }
+            catch (Exception ex) {
+            }
         }
-        return uuids;
+        return uuids.toArray(new UUID[uuids.size()]);
     }
 
     public Map<String, Integer> getMapRaw(String indentifier) {
