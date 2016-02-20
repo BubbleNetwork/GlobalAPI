@@ -2,7 +2,6 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging.messages.handsha
 
 import com.google.common.io.ByteArrayDataInput;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageObject;
-import com.thebubblenetwork.api.global.type.ServerTypeObject;
 import com.thebubblenetwork.api.global.type.ServerType;
 
 import java.io.DataOutputStream;
@@ -44,7 +43,7 @@ public class AssignMessage extends AbstractMessageObject {
 
     public void serialize(ByteArrayDataInput in){
         this.id = in.readInt();
-        this.type = ServerTypeObject.getType(in.readUTF());
+        this.type = ServerType.getType(in.readUTF());
     }
 
     public int getId() {

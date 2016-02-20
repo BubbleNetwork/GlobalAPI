@@ -8,7 +8,7 @@ import com.thebubblenetwork.api.global.plugin.updater.SQLUpdater;
 import com.thebubblenetwork.api.global.plugin.updater.Updatetask;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
-import com.thebubblenetwork.api.global.type.ServerTypeObject;
+import com.thebubblenetwork.api.global.type.ServerType;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -57,16 +57,16 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
             @Override
             public void update(SQLConnection connection) throws SQLException, ClassNotFoundException {
                 ResultSet set = SQLUtil.query(getConnection(),"servertypes","*",new SQLUtil.Where("1"));
-                final Set<ServerTypeObject> serverTypeObjects = new HashSet<>();
+                final Set<ServerType> serverTypeObjects = new HashSet<>();
                 while(set.next()){
-                    serverTypeObjects.add(new ServerTypeObject(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer")));
+                    serverTypeObjects.add(new ServerType(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer"),set.getInt("low-limit"),set.getInt("high-limit")));
                 }
                 set.close();
                 runTaskLater(new Runnable() {
                     @Override
                     public void run() {
-                        ServerTypeObject.getTypes().clear();
-                        ServerTypeObject.getTypes().addAll(serverTypeObjects);
+                        ServerType.getTypes().clear();
+                        ServerType.getTypes().addAll(serverTypeObjects);
                     }
                 },0L,TimeUnit.MILLISECONDS);
             }
@@ -265,13 +265,15 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
                         .put("name",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,32))
                         .put("prefix",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,5))
                         .put("maxplayer",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.INT,3))
+                        .put("low-limit",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.INT,3))
+                        .put("high-limit",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.INT,3))
                         .build());
                 logInfo("Creating SQL ServerType Table");
                 endSetup("You must configure your servertypes!");
             }
             ResultSet set = SQLUtil.query(getConnection(),"servertypes","*",new SQLUtil.Where("1"));
             while(set.next()){
-                ServerTypeObject.registerType(new ServerTypeObject(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer")));
+                ServerType.registerType(new ServerType(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer"),set.getInt("low-limit"),set.getInt("high-limit")));
             }
             set.close();
         }
