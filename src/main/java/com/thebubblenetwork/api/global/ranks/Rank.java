@@ -80,7 +80,6 @@ public class Rank {
         } catch (Exception e) {
             d = Decision.CONTINUE;
         }
-        System.out.println("[Permissions] [Debug] " + r.getName() + " has " + d.toString() + " for " + indentifier);
         return d;
     }
 

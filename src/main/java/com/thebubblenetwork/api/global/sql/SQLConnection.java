@@ -78,7 +78,6 @@ public class SQLConnection {
      * @throws ClassNotFoundException
      */
     public ResultSet querySQL(String query) throws SQLException, ClassNotFoundException {
-        System.out.println("[MySQL] QUERY - " + database + " - " + query);
         if (!checkConnection()) {
             openConnection();
         }
@@ -94,7 +93,6 @@ public class SQLConnection {
      * @throws ClassNotFoundException
      */
     public int updateSQL(String query) throws SQLException, ClassNotFoundException {
-        System.out.println("[MySQL] UPDATE - " + database + " - " + query);
         if (!checkConnection()) {
             openConnection();
         }
@@ -110,7 +108,6 @@ public class SQLConnection {
      * @throws ClassNotFoundException
      */
     public boolean executeSQL(String query) throws SQLException, ClassNotFoundException {
-        System.out.println("[MySQL] EXECUTE - " + database + " - " + query);
         if (!checkConnection()) {
             openConnection();
         }
