@@ -14,6 +14,8 @@ import java.util.Map;
 /**
  * Created by Jacob on 01/12/2015.
  */
+//TODO - New methods coming soon
+@Deprecated
 public class SQLUtil {
     private static String createTable(String table, Map<String, Map.Entry<SQLDataType, Integer>> data) {
         List<String> set = new ArrayList<>();

@@ -95,12 +95,13 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         logInfo("Registering PacketHub...");
         runTaskLater(new Runnable() {
             public void run() {
+                logInfo("Registering PacketHub...");
                 try {
                     hub.register(getInstance());
                 }catch (Exception ex){
-
+                    ex.printStackTrace();
                 }
-                logInfo("PackHub has been registered");
+                logInfo("PacketHub has been registered");
             }
         },
         bungee() ? 1L : 0L,
@@ -111,15 +112,28 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         try{
             if(!SQLUtil.tableExists(getConnection(),"updates")){
                 logInfo("Creating updates table");
+                getConnection().executeSQL("CREATE TABLE `updates` (" +
+                        "`artifact` VARCHAR(32) NOT NULL," +
+                        "`version` INT(3) NOT NULL," +
+                        "`url` VARCHAR(255) NOT NULL," +
+                        "PRIMARY KEY (`artifact`)," +
+                        "UNIQUE INDEX `UNIQUE KEY` (`artifact`)," +
+                        "UNIQUE INDEX `UNIQUE URL` (`url`)," +
+                        "INDEX `KEY` (`artifact`)" +
+                        ")" +
+                        ";");
+                //TODO - SQL API
+                /*
                 SQLUtil.createTable(getConnection(),"updates",
                         new ImmutableMap.Builder<String,Map.Entry<SQLUtil.SQLDataType,Integer>>()
                                 .put("artifact",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,32))
                                 .put("version",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.INT,3))
                                 .put("url", new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,-1))
                                 .build());
+                                */
             }
         }
-        catch (SQLException|ClassNotFoundException ex){
+        catch (Exception ex){
             logSevere(ex.getMessage());
             logSevere("Error creating updates table");
         }
@@ -261,6 +275,20 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
 
         try{
             if(!SQLUtil.tableExists(getConnection(),"servertypes")){
+                //TODO - SQL API
+                connection.executeSQL("CREATE TABLE `servertypes` (" +
+                        "`name` VARCHAR(32) NOT NULL," +
+                        "`prefix` VARCHAR(16) NOT NULL," +
+                        "`maxplayer` INT(3) NOT NULL," +
+                        "`low-limit` INT(3) NOT NULL," +
+                        "`high-limit` INT(3) NOT NULL," +
+                        "PRIMARY KEY (`name`)," +
+                        "UNIQUE INDEX `UNIQUE` (`name`, `prefix`)," +
+                        "INDEX `NAME KEY` (`name`)," +
+                        "INDEX `PREFIX` (`prefix`)" +
+                        ")" +
+                        ";");
+                /*
                 SQLUtil.createTable(getConnection(),"servertypes",new ImmutableMap.Builder<String,Map.Entry<SQLUtil.SQLDataType,Integer>>()
                         .put("name",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,32))
                         .put("prefix",new AbstractMap.SimpleImmutableEntry<>(SQLUtil.SQLDataType.TEXT,5))
@@ -270,6 +298,7 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
                         .build());
                 logInfo("Creating SQL ServerType Table");
                 endSetup("You must configure your servertypes!");
+                */
             }
             ResultSet set = SQLUtil.query(getConnection(),"servertypes","*",new SQLUtil.Where("1"));
             while(set.next()){

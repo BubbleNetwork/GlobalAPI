@@ -1,7 +1,6 @@
 package com.thebubblenetwork.api.global.data;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
@@ -24,10 +23,10 @@ public class DataObject {
         this.data = data;
     }
 
-    public static Map loadData(ResultSet set) throws SQLException {
-        Map datamap = new HashMap();
+    public static Map<String,String> loadData(ResultSet set) throws SQLException {
+        Map<String,String> datamap = new HashMap<>();
         while (set.next()) {
-            datamap.put(set.getObject("key"), set.getObject("value"));
+            datamap.put(set.getString("key"), set.getString("value"));
         }
         set.close();
         return datamap;
