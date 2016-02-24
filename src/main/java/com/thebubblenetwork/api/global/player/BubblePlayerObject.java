@@ -164,7 +164,7 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
     }
 
     public void setTokens(int tokens) {
-        getData().set(PlayerData.TOKENS,tokens);
+        getData().set(PlayerData.CURRENCYBASE + "." + PlayerData.TOKENS,tokens);
         update();
     }
 

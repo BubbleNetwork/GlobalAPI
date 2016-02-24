@@ -2,36 +2,31 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging.messages.request
 
 import com.google.common.io.ByteArrayDataInput;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageObject;
+import com.thebubblenetwork.api.global.type.ServerType;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-/**
- * The Bubble Network 2016
- * GlobalAPI
- * 21/02/2016 {15:58}
- * Created February 2016
- */
-public class InformationRequest extends AbstractMessageObject{
-    private short type;
+public class ServerListRequest extends AbstractMessageObject{
+    private String servertype;
 
-    public InformationRequest(short type) {
-        this.type = type;
+    public ServerListRequest(ServerType servertype) {
+        this.servertype = servertype.getName();
     }
 
-    public InformationRequest(byte[] bytes) {
+    public ServerListRequest(byte[] bytes) {
         super(bytes);
     }
 
     public void serialize(ByteArrayDataInput in) {
-        type = in.readShort();
+        servertype = in.readUTF();
     }
 
     public void parse(DataOutputStream out) throws IOException {
-        out.writeShort(getInformationType());
+        out.writeUTF(servertype);
     }
 
-    public short getInformationType() {
-        return type;
+    public ServerType getServertype() {
+        return ServerType.getType(servertype);
     }
 }

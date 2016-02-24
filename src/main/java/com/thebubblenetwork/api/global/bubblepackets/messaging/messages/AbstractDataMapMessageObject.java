@@ -26,7 +26,7 @@ import java.util.Map;
 public abstract class AbstractDataMapMessageObject extends AbstractMessageObject implements DataMessage{
     private Map<String,String> data;
 
-    public AbstractDataMapMessageObject(Map data) {
+    public AbstractDataMapMessageObject(Map<String,String> data) {
         this.data = data;
     }
 
