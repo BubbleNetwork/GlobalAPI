@@ -54,24 +54,33 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         instance = this;
         addUpdater(this);
         addUpdater(new SQLUpdater() {
-            @Override
             public void update(SQLConnection connection) throws SQLException, ClassNotFoundException {
-                ResultSet set = SQLUtil.query(getConnection(),"servertypes","*",new SQLUtil.Where("1"));
-                final Set<ServerType> serverTypeObjects = new HashSet<>();
-                while(set.next()){
-                    serverTypeObjects.add(new ServerType(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer"),set.getInt("low-limit"),set.getInt("high-limit")));
-                }
-                set.close();
-                runTaskLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        ServerType.getTypes().clear();
-                        ServerType.getTypes().addAll(serverTypeObjects);
+                ResultSet set = null;
+                try {
+                    set = SQLUtil.query(getConnection(), "servertypes", "*", new SQLUtil.Where("1"));
+                    final Set<ServerType> serverTypeObjects = new HashSet<>();
+                    while (set.next()) {
+                        serverTypeObjects.add(new ServerType(set.getString("name"), set.getString("prefix"), set.getInt("maxplayer"), set.getInt("low-limit"), set.getInt("high-limit")));
                     }
-                },0L,TimeUnit.MILLISECONDS);
+                    runTaskLater(new Runnable() {
+                        public void run() {
+                            synchronized (ServerType.getTypes()){
+                                ServerType.getTypes().clear();
+                                for(ServerType serverType:serverTypeObjects){
+                                    ServerType.registerType(serverType);
+                                }
+                            }
+                        }
+                    },0L,TimeUnit.MILLISECONDS);
+                }
+                finally {
+                    try {
+                        if(set != null)set.close();
+                    } catch (Throwable throwable) {
+                    }
+                }
             }
 
-            @Override
             public String getName() {
                 return "ServerTypeUpdater";
             }

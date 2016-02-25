@@ -49,7 +49,7 @@ public class PacketHub implements XServerListener {
             findHard(plugin);
         }
         manager.getEventHandler().registerListenerUnsafe(plugin.getPlugin(),this);
-        currentserver = manager.getHomeServer();
+        currentserver = getManager().getHomeServer();
         //Setting up fakeservers
         for(XServer server:getManager().getServers()){
             if(isValid(server)){
@@ -125,7 +125,7 @@ public class PacketHub implements XServerListener {
     }
 
     public boolean isValid(XServer server){
-        return server != currentserver && !server.getName().equals(currentserver.getName());
+        return server != getCurrentserver() && !server.getName().equals(getCurrentserver().getName()) && server.getPort() != getCurrentserver().getPort();
     }
 
     public XServer getCurrentserver() {
