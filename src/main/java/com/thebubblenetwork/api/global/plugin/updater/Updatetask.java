@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Updatetask<P> extends Thread implements Runnable{
+public abstract class Updatetask extends Thread implements Runnable{
     public static Updatetask instance;
 
     private long start = System.currentTimeMillis();
@@ -92,31 +92,28 @@ public abstract class Updatetask<P> extends Thread implements Runnable{
         }
         if(streamMap.size() > 0) {
             update(new Runnable() {
-                @Override
                 public void run() {
-                    new ReloadTask<P>(getPlugman(),getFile(),getPlugin()){
-                        public void whenUnloaded() {
-                            for(Map.Entry<FileUpdater,InputStream> update:streamMap.entrySet()){
+                    for(final Map.Entry<FileUpdater,InputStream> update:streamMap.entrySet()) {
+                        new ReloadTask(update.getKey()) {
+                            public void whenUnloaded() {
                                 FileUpdater updater = update.getKey();
                                 InputStream stream = update.getValue();
-                                try{
-                                    Files.copy(stream,updater.getReplace().toPath(),StandardCopyOption.REPLACE_EXISTING);
+                                try {
+                                    Files.copy(stream, updater.getReplace().toPath(), StandardCopyOption.REPLACE_EXISTING);
                                     logInfo("Successfully installed update " + updater.getArtifact());
-                                }
-                                catch (Exception ex){
+                                } catch (Exception ex) {
                                     logSevere(ex.getMessage());
                                     logSevere(ex.getClass().getName());
                                     logSevere("Failed to install update " + updater.getArtifact());
-                                }
-                                finally {
+                                } finally {
                                     try {
                                         stream.close();
                                     } catch (Exception e) {
                                     }
                                 }
                             }
-                        }
-                    }.start();
+                        }.start();
+                    }
                 }
             });
         }
@@ -125,8 +122,6 @@ public abstract class Updatetask<P> extends Thread implements Runnable{
     }
 
     public abstract void update(Runnable r);
-    public abstract Plugman<P> getPlugman();
-    public abstract P getPlugin();
     public abstract File getFile();
     public abstract void logInfo(String line);
     public abstract void logSevere(String line);

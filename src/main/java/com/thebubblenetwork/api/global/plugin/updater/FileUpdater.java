@@ -6,4 +6,6 @@ public interface FileUpdater {
     File getReplace();
     String getArtifact();
     int getVersion();
+    void updateTaskBefore();
+    void updateTaskAfter();
 }

@@ -151,7 +151,7 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         runTaskLater(new Runnable() {
             public void run() {
                 try {
-                    new Updatetask<P>(getConnection(), "updates", fileupdaters, sqlUpdaters){
+                    new Updatetask(getConnection(), "updates", fileupdaters, sqlUpdaters){
                         String name = getName();
 
                         public void logInfo(String s){
@@ -164,14 +164,6 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
 
                         public void update(Runnable r) {
                             BubbleHubObject.this.update(r);
-                        }
-
-                        public Plugman<P> getPlugman() {
-                            return BubbleHubObject.this.getPlugman();
-                        }
-
-                        public P getPlugin() {
-                            return BubbleHubObject.this.getPlugin();
                         }
 
                         public File getFile() {
