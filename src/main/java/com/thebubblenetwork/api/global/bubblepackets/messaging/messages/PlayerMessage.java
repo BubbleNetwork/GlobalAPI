@@ -2,8 +2,6 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging.messages;
 
 import com.thebubblenetwork.api.global.bubblepackets.messaging.IPluginMessage;
 
-import java.util.UUID;
-
 /**
  * Copyright Statement
  * ----------------------

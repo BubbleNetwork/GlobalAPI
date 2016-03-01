@@ -7,7 +7,7 @@ import com.thebubblenetwork.api.global.type.ServerType;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PlayerServerRequest extends AbstractMessageObject{
+public class PlayerServerRequest extends AbstractMessageObject {
     private ServerType type;
 
     public PlayerServerRequest(ServerType type) {

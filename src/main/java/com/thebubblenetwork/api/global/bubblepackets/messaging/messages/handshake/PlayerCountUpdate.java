@@ -24,12 +24,12 @@ import java.io.IOException;
 public class PlayerCountUpdate extends AbstractMessageObject {
     private int online;
 
-    public PlayerCountUpdate(int online){
+    public PlayerCountUpdate(int online) {
         super();
         this.online = online;
     }
 
-    public PlayerCountUpdate(byte[] bytes){
+    public PlayerCountUpdate(byte[] bytes) {
         super(bytes);
     }
 
@@ -41,7 +41,7 @@ public class PlayerCountUpdate extends AbstractMessageObject {
         out.writeInt(online);
     }
 
-    public int getOnline(){
+    public int getOnline() {
         return online;
     }
 }

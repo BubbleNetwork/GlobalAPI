@@ -13,67 +13,57 @@ import java.util.Set;
  * Created by Jacob on 31/12/2015.
  */
 public class Rank {
-    private static Set<Rank> ranks = new HashSet<>();
-
     public static Set<Rank> getRanks() {
         return ranks;
     }
 
-    private RankData data;
-    private String name;
-
-    public Rank(String name, RankData data) {
-        this.name = name;
-        this.data = data;
-    }
-
-
     public static Rank getDefault() {
-        for (Rank r : getRanks())
-            if (r.isDefault())
+        for (Rank r : getRanks()) {
+            if (r.isDefault()) {
                 return r;
+            }
+        }
         Rank r;
         return (r = getRank("default")) != null ? r : ranks.size() > 0 ? Iterables.get(ranks, 0) : null;
     }
 
     public static Rank getRank(String s) {
-        for(Rank r:getRanks()){
-            if(r.getName().equalsIgnoreCase(s))return r;
+        for (Rank r : getRanks()) {
+            if (r.getName().equalsIgnoreCase(s)) {
+                return r;
+            }
         }
         return null;
     }
 
-    public static void loadRank(String name,Map<String,String> map){
+    public static void loadRank(String name, Map<String, String> map) {
         Rank r;
-        if((r = getRank(name)) != null){
-            if(map == null){
+        if ((r = getRank(name)) != null) {
+            if (map == null) {
                 ranks.remove(r);
-            }
-            else{
+            } else {
                 r.getData().getRaw().clear();
-                for(Map.Entry<String,String> entry:map.entrySet()){
-                    r.getData().getRaw().put(entry.getKey(),entry.getValue());
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    r.getData().getRaw().put(entry.getKey(), entry.getValue());
                 }
             }
         }
-        ranks.add(new Rank(name,new RankData(map)));
+        ranks.add(new Rank(name, new RankData(map)));
     }
 
     private static boolean isAuthorized(Rank r, String indentifier) {
-        try{
-            return isAuthorizedPrimative(r,indentifier).decision();
-        }
-        catch (UnsupportedOperationException e1){
+        try {
+            return isAuthorizedPrimative(r, indentifier).decision();
+        } catch (UnsupportedOperationException e1) {
             try {
                 return isAuthorizedPrimative(r, "*").decision();
-            }
-            catch (UnsupportedOperationException e2){
-                return r.getInheritance() != null && isAuthorized(r,indentifier);
+            } catch (UnsupportedOperationException e2) {
+                return r.getInheritance() != null && isAuthorized(r, indentifier);
             }
         }
     }
 
-    private static Decision isAuthorizedPrimative(Rank r, String indentifier){
+    private static Decision isAuthorizedPrimative(Rank r, String indentifier) {
         Decision d;
         try {
             d = Decision.getDecision(r.getData().getBoolean(indentifier));
@@ -83,48 +73,41 @@ public class Rank {
         return d;
     }
 
-    enum Decision{
-        CONTINUE(),TRUE(),FALSE();
+    private static Set<Rank> ranks = new HashSet<>();
+    private RankData data;
+    private String name;
 
-        static Decision getDecision(boolean b){
-            if(b)return TRUE;
-            return FALSE;
-        }
-
-        boolean decision(){
-            if(this == TRUE)return true;
-            if(this == FALSE)return false;
-            throw new UnsupportedOperationException();
-        }
+    public Rank(String name, RankData data) {
+        this.name = name;
+        this.data = data;
     }
-
 
     public String getName() {
         return name;
     }
 
-    public void setPrefix(String s){
-        getData().set(RankData.PREFIX,s);
-    }
-
     public String getPrefix() {
         try {
-            return ChatColor.translateAlternateColorCodes('&',getData().getString(RankData.PREFIX));
+            return ChatColor.translateAlternateColorCodes('&', getData().getString(RankData.PREFIX));
         } catch (InvalidBaseException ex) {
             return "";
         }
     }
 
-    public void setSuffix(String s){
-        getData().set(RankData.SUFFIX,s);
+    public void setPrefix(String s) {
+        getData().set(RankData.PREFIX, s);
     }
 
     public String getSuffix() {
         try {
-            return ChatColor.translateAlternateColorCodes('&',getData().getString(RankData.SUFFIX));
+            return ChatColor.translateAlternateColorCodes('&', getData().getString(RankData.SUFFIX));
         } catch (InvalidBaseException ex) {
             return "";
         }
+    }
+
+    public void setSuffix(String s) {
+        getData().set(RankData.SUFFIX, s);
     }
 
     protected String getInheritanceString() {
@@ -144,16 +127,16 @@ public class Rank {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return getName();
-    }
-
-    public void setInheritance(Rank r){
-        getData().set(RankData.INHERITANCE,r == null ? null : r.getName());
     }
 
     public Rank getInheritance() {
         return getRank(getInheritanceString());
+    }
+
+    public void setInheritance(Rank r) {
+        getData().set(RankData.INHERITANCE, r == null ? null : r.getName());
     }
 
     public boolean isAuthorized(String indentifier) {
@@ -162,5 +145,26 @@ public class Rank {
 
     public RankData getData() {
         return data;
+    }
+
+    enum Decision {
+        CONTINUE(), TRUE(), FALSE();
+
+        static Decision getDecision(boolean b) {
+            if (b) {
+                return TRUE;
+            }
+            return FALSE;
+        }
+
+        boolean decision() {
+            if (this == TRUE) {
+                return true;
+            }
+            if (this == FALSE) {
+                return false;
+            }
+            throw new UnsupportedOperationException();
+        }
     }
 }

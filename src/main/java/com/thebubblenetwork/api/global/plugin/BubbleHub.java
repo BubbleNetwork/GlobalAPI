@@ -26,18 +26,32 @@ import java.util.UUID;
  */
 public interface BubbleHub<P> extends FileUpdater {
     P getPlugin();
+
     Object getPlayer(UUID u);
+
     SQLConnection getConnection();
+
     PropertiesFile getSQLProperties();
+
     PacketHub getPacketHub();
+
     XServerPlugin getXPlugin();
+
     void onEnable();
+
     void onDisable();
+
     void onLoad();
+
     void endSetup(String reason) throws RuntimeException;
+
     void logInfo(String info);
+
     void logSevere(String error);
+
     void addUpdater(SQLUpdater updater);
+
     void addUpdater(FileUpdater updater);
+
     Plugman<P> getPlugman();
 }

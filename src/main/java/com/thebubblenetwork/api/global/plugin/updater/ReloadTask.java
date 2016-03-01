@@ -4,7 +4,7 @@ package com.thebubblenetwork.api.global.plugin.updater;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class ReloadTask extends Thread implements Runnable{
+public abstract class ReloadTask extends Thread implements Runnable {
     private FileUpdater updater;
 
     public ReloadTask(FileUpdater updater) {
@@ -16,15 +16,15 @@ public abstract class ReloadTask extends Thread implements Runnable{
         try {
             updater.updateTaskBefore();
         } catch (Exception e) {
-            Logger.getGlobal().log(Level.WARNING,"Could not disable itself",e);
+            Logger.getGlobal().log(Level.WARNING, "Could not disable itself", e);
             return;
         }
         whenUnloaded();
         try {
-            updater.updateTaskAfter();;
-        }
-        catch (Exception e){
-            Logger.getGlobal().log(Level.WARNING,"Could not enable itself",e);
+            updater.updateTaskAfter();
+            ;
+        } catch (Exception e) {
+            Logger.getGlobal().log(Level.WARNING, "Could not enable itself", e);
         }
     }
 

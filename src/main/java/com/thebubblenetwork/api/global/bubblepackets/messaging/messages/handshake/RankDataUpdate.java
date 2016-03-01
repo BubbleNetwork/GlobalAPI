@@ -25,7 +25,7 @@ import java.util.Map;
 public class RankDataUpdate extends AbstractDataMapMessageObject {
     private String name;
 
-    public RankDataUpdate(String name,Map<String,String> map) {
+    public RankDataUpdate(String name, Map<String, String> map) {
         super(map);
         this.name = name;
     }
@@ -33,6 +33,7 @@ public class RankDataUpdate extends AbstractDataMapMessageObject {
     public RankDataUpdate(byte[] bytes) {
         super(bytes);
     }
+
     public void serializeInfo(ByteArrayDataInput in) {
         name = in.readUTF();
     }
@@ -41,7 +42,7 @@ public class RankDataUpdate extends AbstractDataMapMessageObject {
         out.writeUTF(name);
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 }

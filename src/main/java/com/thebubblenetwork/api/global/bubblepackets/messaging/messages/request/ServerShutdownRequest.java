@@ -6,7 +6,7 @@ import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageOb
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ServerShutdownRequest extends AbstractMessageObject{
+public class ServerShutdownRequest extends AbstractMessageObject {
     public ServerShutdownRequest() {
     }
 

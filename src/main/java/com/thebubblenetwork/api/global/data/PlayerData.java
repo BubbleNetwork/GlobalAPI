@@ -7,36 +7,21 @@ import java.util.*;
  */
 public class PlayerData extends DataObject {
 
-    public static final String
-            NICKNAME = "nickname",
-            RANKBASE = "rank",
-            STATSBASE = "stats",
-            FRIENDSBASE = "friends",
-            ITEMSBASE = "items",
-            PACKS = "packs",
-            KITBASE = "kits",
-            CURRENCYBASE = "currency",
-            NAME = "name",
-            TOKENS = "tokens",
-            MAINRANK = RANKBASE + ".mainrank",
-            SUBRANKS = RANKBASE + ".subranks",
-            FRIENDSLIST = FRIENDSBASE + ".current",
-            FRIENDINCOMINGRQ = FRIENDSBASE + ".incoming";
+    public static final String NICKNAME = "nickname", RANKBASE = "rank", STATSBASE = "stats", FRIENDSBASE = "friends", ITEMSBASE = "items", PACKS = "packs", KITBASE = "kits", CURRENCYBASE = "currency", NAME = "name", TOKENS = "tokens", MAINRANK = RANKBASE + ".mainrank", SUBRANKS = RANKBASE + ".subranks", FRIENDSLIST = FRIENDSBASE + ".current", FRIENDINCOMINGRQ = FRIENDSBASE + ".incoming";
 
     public static String table = "playerdata";
 
-    public PlayerData(Map<String,String> loaded) {
+    public PlayerData(Map<String, String> loaded) {
         super(loaded);
     }
 
-    public UUID[] getUUIDList(String indentifier) throws InvalidBaseException{
+    public UUID[] getUUIDList(String indentifier) throws InvalidBaseException {
         String[] list = getString(indentifier).split(",");
         Set<UUID> uuids = new HashSet<>();
-        for(String s:list){
+        for (String s : list) {
             try {
                 uuids.add(UUID.fromString(s));
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
             }
         }
         return uuids.toArray(new UUID[uuids.size()]);

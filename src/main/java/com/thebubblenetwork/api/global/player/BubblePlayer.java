@@ -23,33 +23,62 @@ import java.util.UUID;
  */
 public interface BubblePlayer<T> {
     PlayerData getData();
+
+    void setData(Map<String, String> data);
+
     String getName();
+
     T getPlayer();
+
     Rank getRank();
+
     void setRank(Rank rank);
+
     Rank[] getSubRanks();
-    void setSubRanks(Rank... subRanks);
+
     void setSubRanks(Iterable<Rank> subRanks);
+
+    void setSubRanks(Rank... subRanks);
+
     int getTokens();
+
     void setTokens(int tokens);
+
     Map<String, Integer> getStats(String game);
-    void setStat(String game,String identifier,int id);
+
+    void setStat(String game, String identifier, int id);
+
     Map<String, Integer> getKits(String game);
-    void setKit(String game,String indentifier,int id);
+
+    void setKit(String game, String indentifier, int id);
+
     boolean isAuthorized(String permission);
+
     UUID getUUID();
+
     UUID[] getFriends();
-    void setFriends(UUID... friends);
+
     void setFriends(Iterable<UUID> friends);
+
+    void setFriends(UUID... friends);
+
     UUID[] getFriendIncomingRequests();
+
     void setFriendsIncomingRequests(UUID... friends);
+
     void setFriendsIncomingRequests(Iterable<UUID> friends);
-    void setData(Map<String,String> data);
+
     Map<String, Integer> getHubItems();
-    void setHubItem(String item,int id);
+
+    void setHubItem(String item, int id);
+
     Map<String, Integer> getPacks();
-    void setPacks(String pack,int amount);
+
+    void setPacks(String pack, int amount);
+
     String getNickName();
+
     void setNick(String nick);
+
     void save();
 }

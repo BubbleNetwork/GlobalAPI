@@ -14,8 +14,8 @@ import java.io.IOException;
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * Wrote by Jacob Evans <jacobevansminor@gmail.com>, 01 2016
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * Class information
  * ---------------------
  * Package: com.thebubblenetwork.bubblebungee.servermanager.messaging
@@ -32,7 +32,7 @@ public class AssignMessage extends AbstractMessageObject {
         this.type = type;
     }
 
-    public AssignMessage(byte[] bytes){
+    public AssignMessage(byte[] bytes) {
         super(bytes);
     }
 
@@ -41,7 +41,7 @@ public class AssignMessage extends AbstractMessageObject {
         out.writeUTF(type.getName());
     }
 
-    public void serialize(ByteArrayDataInput in){
+    public void serialize(ByteArrayDataInput in) {
         this.id = in.readInt();
         this.type = ServerType.getType(in.readUTF());
     }

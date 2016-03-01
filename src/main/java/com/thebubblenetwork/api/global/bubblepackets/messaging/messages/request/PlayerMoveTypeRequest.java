@@ -8,8 +8,8 @@ import com.thebubblenetwork.api.global.type.ServerType;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PlayerMoveTypeRequest extends AbstractMessageObject implements PlayerMessage{
-    private String player,servertype;
+public class PlayerMoveTypeRequest extends AbstractMessageObject implements PlayerMessage {
+    private String player, servertype;
 
     public PlayerMoveTypeRequest(String player, ServerType servertype) {
         this.player = player;
@@ -34,7 +34,7 @@ public class PlayerMoveTypeRequest extends AbstractMessageObject implements Play
         return player;
     }
 
-    public ServerType getServerType(){
+    public ServerType getServerType() {
         return ServerType.getType(servertype);
     }
 }

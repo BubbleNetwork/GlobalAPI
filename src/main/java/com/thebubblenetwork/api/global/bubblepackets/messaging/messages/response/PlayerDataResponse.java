@@ -7,7 +7,6 @@ import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.PlayerMe
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Copyright Statement
@@ -24,27 +23,27 @@ import java.util.UUID;
  * Date-created: 25/01/2016 00:00
  * Project: BubblePackets
  */
-public class PlayerDataResponse extends AbstractDataMapMessageObject implements PlayerMessage{
+public class PlayerDataResponse extends AbstractDataMapMessageObject implements PlayerMessage {
     private String name;
 
-    public PlayerDataResponse(String name, Map<String,String> data) {
+    public PlayerDataResponse(String name, Map<String, String> data) {
         super(data);
         this.name = name;
     }
 
-    public PlayerDataResponse(byte[] bytes){
+    public PlayerDataResponse(byte[] bytes) {
         super(bytes);
     }
 
-    public void serializeInfo(ByteArrayDataInput in){
+    public void serializeInfo(ByteArrayDataInput in) {
         name = in.readUTF();
     }
 
-    public void parseInfo(DataOutputStream out) throws IOException{
+    public void parseInfo(DataOutputStream out) throws IOException {
         out.writeUTF(name);
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 }

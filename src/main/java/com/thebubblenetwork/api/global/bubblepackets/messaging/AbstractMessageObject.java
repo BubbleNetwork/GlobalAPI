@@ -14,8 +14,8 @@ import java.io.IOException;
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * Wrote by Jacob Evans <jacobevansminor@gmail.com>, 01 2016
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * Class information
  * ---------------------
  * Package: com.thebubblenetwork.bubblebungee.servermanager.messaging
@@ -23,19 +23,19 @@ import java.io.IOException;
  * Project: com.thebubblenetwork.bubblebungee
  */
 
-public abstract class AbstractMessageObject implements IPluginMessage{
+public abstract class AbstractMessageObject implements IPluginMessage {
     private MessageType type;
 
-    public AbstractMessageObject(){
+    public AbstractMessageObject() {
         this.type = MessageType.register(getClass());
     }
 
-    public AbstractMessageObject(byte[] bytes){
+    public AbstractMessageObject(byte[] bytes) {
         this();
         process(bytes);
     }
 
-    public MessageType getType(){
+    public MessageType getType() {
         return type;
     }
 
@@ -51,11 +51,12 @@ public abstract class AbstractMessageObject implements IPluginMessage{
         return stream.toByteArray();
     }
 
-    public void process(byte[] bytes){
+    public void process(byte[] bytes) {
         ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
         serialize(in);
     }
 
     public abstract void serialize(ByteArrayDataInput in);
+
     public abstract void parse(DataOutputStream out) throws IOException;
 }

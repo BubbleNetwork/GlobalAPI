@@ -1,6 +1,5 @@
 package com.thebubblenetwork.api.global.plugin;
 
-import com.google.common.collect.ImmutableMap;
 import com.thebubblenetwork.api.global.bubblepackets.PacketHub;
 import com.thebubblenetwork.api.global.file.PropertiesFile;
 import com.thebubblenetwork.api.global.plugin.updater.FileUpdater;
@@ -14,9 +13,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.AbstractMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -35,13 +32,12 @@ import java.util.concurrent.TimeUnit;
  * Date-created: 26/01/2016 20:28
  * Project: GlobalAPI
  */
-public abstract class BubbleHubObject<P> implements BubbleHub<P>{
-    private static BubbleHub<?> instance;
-
-    public static BubbleHub getInstance(){
+public abstract class BubbleHubObject<P> implements BubbleHub<P> {
+    public static BubbleHub getInstance() {
         return instance;
     }
 
+    private static BubbleHub<?> instance;
     private final File sqlpropertiesfile = new File("sql.properties");
     private PropertiesFile sqlproperties;
     private SQLConnection connection;
@@ -49,7 +45,7 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
     private Set<FileUpdater> fileupdaters = new HashSet<>();
     private Set<SQLUpdater> sqlUpdaters = new HashSet<>();
 
-    public BubbleHubObject(){
+    public BubbleHubObject() {
         logInfo("Assigning instance...");
         instance = this;
         addUpdater(this);
@@ -64,18 +60,19 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
                     }
                     runTaskLater(new Runnable() {
                         public void run() {
-                            synchronized (ServerType.getTypes()){
+                            synchronized (ServerType.getTypes()) {
                                 ServerType.getTypes().clear();
-                                for(ServerType serverType:serverTypeObjects){
+                                for (ServerType serverType : serverTypeObjects) {
                                     ServerType.registerType(serverType);
                                 }
                             }
                         }
-                    },0L,TimeUnit.MILLISECONDS);
-                }
-                finally {
+                    }, 0L, TimeUnit.MILLISECONDS);
+                } finally {
                     try {
-                        if(set != null)set.close();
+                        if (set != null) {
+                            set.close();
+                        }
                     } catch (Throwable throwable) {
                     }
                 }
@@ -87,7 +84,7 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         });
     }
 
-    public final void onEnable(){
+    public final void onEnable() {
 
         logInfo("Creating PacketHub");
 
@@ -107,19 +104,17 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
                 logInfo("Registering PacketHub...");
                 try {
                     hub.register(getInstance());
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 logInfo("PacketHub has been registered");
             }
-        },
-        bungee() ? 1L : 0L,
-        TimeUnit.SECONDS);
+        }, bungee() ? 1L : 0L, TimeUnit.SECONDS);
 
         logInfo("Finding updates table");
 
-        try{
-            if(!SQLUtil.tableExists(getConnection(),"updates")){
+        try {
+            if (!SQLUtil.tableExists(getConnection(), "updates")) {
                 logInfo("Creating updates table");
                 getConnection().executeSQL("CREATE TABLE `updates` (" +
                         "`artifact` VARCHAR(32) NOT NULL," +
@@ -141,8 +136,7 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
                                 .build());
                                 */
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logSevere(ex.getMessage());
             logSevere("Error creating updates table");
         }
@@ -151,14 +145,14 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         runTaskLater(new Runnable() {
             public void run() {
                 try {
-                    new Updatetask(getConnection(), "updates", fileupdaters, sqlUpdaters){
+                    new Updatetask(getConnection(), "updates", fileupdaters, sqlUpdaters) {
                         String name = getName();
 
-                        public void logInfo(String s){
+                        public void logInfo(String s) {
                             System.out.println("[" + name + "] " + s);
                         }
 
-                        public void logSevere(String s){
+                        public void logSevere(String s) {
                             System.err.println("[" + name + "] " + s);
                         }
 
@@ -174,12 +168,12 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
                     logSevere(e.getMessage());
                     logSevere("Error running updater");
                 }
-                runTaskLater(this,5L,TimeUnit.MINUTES);
+                runTaskLater(this, 5L, TimeUnit.MINUTES);
             }
-        },30L,TimeUnit.SECONDS);
+        }, 30L, TimeUnit.SECONDS);
     }
 
-    public final void onDisable(){
+    public final void onDisable() {
         logInfo("Disabling plugin");
 
         onBubbleDisable();
@@ -196,7 +190,7 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
 
         getPacketHub().unregisterThis();
 
-        if(Updatetask.instance != null){
+        if (Updatetask.instance != null) {
             try {
                 Updatetask.instance.interrupt();
             } catch (Exception e) {
@@ -208,15 +202,12 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         }
     }
 
-    public final void onLoad(){
+    public final void onLoad() {
         //Loading properties
         logInfo("Loading SQL Properties");
-        if(!sqlpropertiesfile.exists()){
+        if (!sqlpropertiesfile.exists()) {
             try {
-                PropertiesFile.generateFresh(sqlpropertiesfile,new String[]
-                                {"hostname","port","username","password","database"},
-                        new String[]
-                                {"localhost","3306","root","NONE","bubbleserver"});
+                PropertiesFile.generateFresh(sqlpropertiesfile, new String[]{"hostname", "port", "username", "password", "database"}, new String[]{"localhost", "3306", "root", "NONE", "bubbleserver"});
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -238,19 +229,11 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
 
         String temp;
         try {
-            connection = new SQLConnection(
-                    sqlproperties.getString("hostname"),
-                    sqlproperties.getNumber("port").intValue(),
-                    sqlproperties.getString("database"),
-                    sqlproperties.getString("username"),
-                    (temp = sqlproperties.getString("password")).equals("NONE") ? null : temp
-            );
-        }
-        catch (ParseException ex){
+            connection = new SQLConnection(sqlproperties.getString("hostname"), sqlproperties.getNumber("port").intValue(), sqlproperties.getString("database"), sqlproperties.getString("username"), (temp = sqlproperties.getString("password")).equals("NONE") ? null : temp);
+        } catch (ParseException ex) {
             logSevere(ex.getMessage());
             endSetup("Invalid database port");
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logSevere(ex.getMessage());
             endSetup("Invalid configuration");
         }
@@ -274,8 +257,8 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
 
         logInfo("Finding server types...");
 
-        try{
-            if(!SQLUtil.tableExists(getConnection(),"servertypes")){
+        try {
+            if (!SQLUtil.tableExists(getConnection(), "servertypes")) {
                 //TODO - SQL API
                 connection.executeSQL("CREATE TABLE `servertypes` (" +
                         "`name` VARCHAR(32) NOT NULL," +
@@ -301,13 +284,12 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
                 endSetup("You must configure your servertypes!");
                 */
             }
-            ResultSet set = SQLUtil.query(getConnection(),"servertypes","*",new SQLUtil.Where("1"));
-            while(set.next()){
-                ServerType.registerType(new ServerType(set.getString("name"),set.getString("prefix"),set.getInt("maxplayer"),set.getInt("low-limit"),set.getInt("high-limit")));
+            ResultSet set = SQLUtil.query(getConnection(), "servertypes", "*", new SQLUtil.Where("1"));
+            while (set.next()) {
+                ServerType.registerType(new ServerType(set.getString("name"), set.getString("prefix"), set.getInt("maxplayer"), set.getInt("low-limit"), set.getInt("high-limit")));
             }
             set.close();
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logSevere(ex.getMessage());
             endSetup("Could not find server types");
         }
@@ -327,15 +309,15 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
         logInfo("Plugin loading complete");
     }
 
-    public SQLConnection getConnection(){
+    public SQLConnection getConnection() {
         return connection;
     }
 
-    public PropertiesFile getSQLProperties(){
+    public PropertiesFile getSQLProperties() {
         return sqlproperties;
     }
 
-    public PacketHub getPacketHub(){
+    public PacketHub getPacketHub() {
         return hub;
     }
 
@@ -348,10 +330,16 @@ public abstract class BubbleHubObject<P> implements BubbleHub<P>{
     }
 
     public abstract void update(Runnable r);
+
     public abstract boolean bungee();
-    public abstract void runTaskLater(Runnable r,long l,TimeUnit timeUnit);
+
+    public abstract void runTaskLater(Runnable r, long l, TimeUnit timeUnit);
+
     public abstract void saveXServerDefaults();
+
     public abstract void onBubbleEnable();
+
     public abstract void onBubbleDisable();
+
     public abstract void onBubbleLoad();
 }

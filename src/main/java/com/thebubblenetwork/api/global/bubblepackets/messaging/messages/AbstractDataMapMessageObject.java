@@ -4,7 +4,8 @@ import com.google.common.io.ByteArrayDataInput;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageObject;
 import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +24,10 @@ import java.util.Map;
  * Date-created: 26/01/2016 19:47
  * Project: BubblePackets
  */
-public abstract class AbstractDataMapMessageObject extends AbstractMessageObject implements DataMessage{
-    private Map<String,String> data;
+public abstract class AbstractDataMapMessageObject extends AbstractMessageObject implements DataMessage {
+    private Map<String, String> data;
 
-    public AbstractDataMapMessageObject(Map<String,String> data) {
+    public AbstractDataMapMessageObject(Map<String, String> data) {
         this.data = data;
     }
 
@@ -37,8 +38,9 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
     public void serialize(ByteArrayDataInput in) {
         serializeInfo(in);
         int size = in.readInt();
-        if(size == -1)data = null;
-        else {
+        if (size == -1) {
+            data = null;
+        } else {
             data = new HashMap<>();
             for (int done = 0; done < size; done++) {
                 try {
@@ -56,10 +58,9 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
 
     public void parse(DataOutputStream out) throws IOException {
         parseInfo(out);
-        if(getData() == null){
+        if (getData() == null) {
             out.writeInt(-1);
-        }
-        else {
+        } else {
             out.writeInt(getData().size());
             for (Map.Entry<String, String> entry : getData().entrySet()) {
                 out.writeUTF(entry.getKey());
@@ -72,7 +73,7 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
 
     public abstract void parseInfo(DataOutputStream out) throws IOException;
 
-    public Map<String,String> getData(){
+    public Map<String, String> getData() {
         return data;
     }
 }

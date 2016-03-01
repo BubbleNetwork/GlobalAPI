@@ -24,10 +24,8 @@ import java.util.*;
  * Date-created: 26/01/2016 20:19
  * Project: GlobalAPI
  */
-public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
-    private static Map<UUID,BubblePlayerObject> playerObjectMap = new HashMap<>();
-
-    public static BubblePlayer getObject(UUID u){
+public abstract class BubblePlayerObject<T> implements BubblePlayer<T> {
+    public static BubblePlayer getObject(UUID u) {
         return playerObjectMap.get(u);
     }
 
@@ -35,16 +33,17 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return playerObjectMap;
     }
 
+    private static Map<UUID, BubblePlayerObject> playerObjectMap = new HashMap<>();
     private UUID u;
     private PlayerData data;
     private T player;
 
-    protected BubblePlayerObject(UUID u,PlayerData data){
+    protected BubblePlayerObject(UUID u, PlayerData data) {
         this.u = u;
         this.data = data;
     }
 
-    public UUID getUUID(){
+    public UUID getUUID() {
         return u;
     }
 
@@ -52,10 +51,18 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return data;
     }
 
+    public void setData(Map<String, String> data) {
+        getData().getRaw().clear();
+        for (Map.Entry<String, String> e : data.entrySet()) {
+            getData().getRaw().put(e.getKey(), e.getValue());
+        }
+        update();
+    }
+
     @SuppressWarnings("unchecked")
-    public T getPlayer(){
-        if(player == null){
-            player = (T)(BubbleHubObject.getInstance().getPlayer(getUUID()));
+    public T getPlayer() {
+        if (player == null) {
+            player = (T) (BubbleHubObject.getInstance().getPlayer(getUUID()));
         }
         return player;
     }
@@ -75,6 +82,11 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return Rank.getRank(s);
     }
 
+    public void setRank(Rank rank) {
+        getData().set(PlayerData.MAINRANK, rank.getName());
+        update();
+    }
+
     private String[] getSubRanksString() throws InvalidBaseException {
         return getData().getString(PlayerData.SUBRANKS).split(",");
     }
@@ -89,10 +101,20 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         List<Rank> ranks = new ArrayList<>();
         for (String rankname : s) {
             Rank r = Rank.getRank(rankname);
-            if (r != null)
+            if (r != null) {
                 ranks.add(r);
+            }
         }
         return ranks.toArray(new Rank[0]);
+    }
+
+    public void setSubRanks(Iterable<Rank> subRanks) {
+        setList(PlayerData.SUBRANKS, toStrings(subRanks));
+        update();
+    }
+
+    public void setSubRanks(Rank... subRanks) {
+        setSubRanks(Arrays.asList(subRanks));
     }
 
     public UUID[] getFriends() {
@@ -101,6 +123,15 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         } catch (InvalidBaseException e) {
             return new UUID[0];
         }
+    }
+
+    public void setFriends(Iterable<UUID> friends) {
+        setList(PlayerData.FRIENDSLIST, toStrings(friends));
+        update();
+    }
+
+    public void setFriends(UUID... friends) {
+        setFriends(Arrays.asList(friends));
     }
 
     public UUID[] getFriendIncomingRequests() {
@@ -127,7 +158,6 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return getData().getMapRaw(PlayerData.PACKS);
     }
 
-
     public Map<String, Integer> getCurrency() {
         return getData().getMapRaw(PlayerData.CURRENCYBASE);
     }
@@ -137,53 +167,22 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
         return currency.containsKey(PlayerData.TOKENS) ? currency.get(PlayerData.TOKENS) : 0;
     }
 
+    public void setTokens(int tokens) {
+        getData().set(PlayerData.CURRENCYBASE + "." + PlayerData.TOKENS, tokens);
+        update();
+    }
+
     public boolean isAuthorized(String permission) {
         return getRank().isAuthorized(permission);
     }
 
-    public void setData(Map<String,String> data) {
-        getData().getRaw().clear();
-        for(Map.Entry<String,String> e: data.entrySet()){
-            getData().getRaw().put(e.getKey(),e.getValue());
-        }
-        update();
-    }
-
-    public void setRank(Rank rank) {
-        getData().set(PlayerData.MAINRANK,rank.getName());
-        update();
-    }
-
-    public void setSubRanks(Rank... subRanks) {
-        setSubRanks(Arrays.asList(subRanks));
-    }
-
-    public void setSubRanks(Iterable<Rank> subRanks) {
-        setList(PlayerData.SUBRANKS,toStrings(subRanks));
-        update();
-    }
-
-    public void setTokens(int tokens) {
-        getData().set(PlayerData.CURRENCYBASE + "." + PlayerData.TOKENS,tokens);
-        update();
-    }
-
     public void setStat(String game, String indentifier, int id) {
-        getData().set(PlayerData.STATSBASE + "." + game + "." + indentifier,id);
+        getData().set(PlayerData.STATSBASE + "." + game + "." + indentifier, id);
         update();
     }
 
     public void setKit(String game, String indentifier, int id) {
-        getData().set(PlayerData.KITBASE + "." + game + "." + indentifier,id);
-        update();
-    }
-
-    public void setFriends(UUID... friends) {
-        setFriends(Arrays.asList(friends));
-    }
-
-    public void setFriends(Iterable<UUID> friends) {
-        setList(PlayerData.FRIENDSLIST,toStrings(friends));
+        getData().set(PlayerData.KITBASE + "." + game + "." + indentifier, id);
         update();
     }
 
@@ -192,47 +191,49 @@ public abstract class BubblePlayerObject<T> implements BubblePlayer<T>{
     }
 
     public void setFriendsIncomingRequests(Iterable<UUID> friends) {
-        setList(PlayerData.FRIENDINCOMINGRQ,toStrings(friends));
+        setList(PlayerData.FRIENDINCOMINGRQ, toStrings(friends));
         update();
     }
 
-    private Set<String> toStrings(Iterable<?> objects){
+    private Set<String> toStrings(Iterable<?> objects) {
         Set<String> set = new HashSet<>();
-        for(Object o:objects)set.add(o.toString());
+        for (Object o : objects) {
+            set.add(o.toString());
+        }
         return set;
     }
 
-    private void setList(String base, Iterable<String> friends){
+    private void setList(String base, Iterable<String> friends) {
         getData().set(base, Joiner.on(",").join(friends));
     }
 
     public void setHubItem(String item, int id) {
-        getData().set(PlayerData.ITEMSBASE + ".item",id);
+        getData().set(PlayerData.ITEMSBASE + ".item", id);
         update();
     }
 
     public void setPacks(String pack, int amount) {
-        getData().set(PlayerData.PACKS + "." + pack,amount);
+        getData().set(PlayerData.PACKS + "." + pack, amount);
         update();
     }
 
     public void setNick(String nick) {
-        getData().set(PlayerData.NICKNAME,nick);
+        getData().set(PlayerData.NICKNAME, nick);
         update();
     }
 
-    public String getNickName(){
+    public String getNickName() {
         String nick;
         try {
             nick = getData().getString(PlayerData.NICKNAME);
         } catch (InvalidBaseException e) {
             return getName();
         }
-        return ChatColor.translateAlternateColorCodes('&',nick);
+        return ChatColor.translateAlternateColorCodes('&', nick);
     }
 
 
-    public void update(){
+    public void update() {
 
     }
 }

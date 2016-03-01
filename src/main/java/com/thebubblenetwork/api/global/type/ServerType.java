@@ -13,17 +13,17 @@ import java.util.Set;
  */
 
 public class ServerType {
-    private static Set<ServerType> types = new HashSet<>();
-
-    public static ServerType registerType(ServerType type){
+    public static ServerType registerType(ServerType type) {
         types.add(type);
         BubbleHubObject.getInstance().logInfo("Registered servertype: " + type.getName());
         return type;
     }
 
-    public static ServerType getType(String name){
-        for(ServerType wrapper:types){
-            if(wrapper.getName().equals(name))return wrapper;
+    public static ServerType getType(String name) {
+        for (ServerType wrapper : types) {
+            if (wrapper.getName().equals(name)) {
+                return wrapper;
+            }
         }
         throw new IllegalArgumentException(name + " is not a correct servertype");
     }
@@ -32,10 +32,11 @@ public class ServerType {
         return types;
     }
 
-    private String name,prefix;
-    private int maxplayers,lowlimit,highlimit;
+    private static Set<ServerType> types = new HashSet<>();
+    private String name, prefix;
+    private int maxplayers, lowlimit, highlimit;
 
-    public ServerType(String name,String prefix, int maxplayers, int lowlimit, int highlimit) {
+    public ServerType(String name, String prefix, int maxplayers, int lowlimit, int highlimit) {
         this.name = name;
         this.highlimit = highlimit;
         this.lowlimit = lowlimit;
@@ -51,7 +52,7 @@ public class ServerType {
         return prefix;
     }
 
-    public int getMaxPlayers(){
+    public int getMaxPlayers() {
         return maxplayers;
     }
 

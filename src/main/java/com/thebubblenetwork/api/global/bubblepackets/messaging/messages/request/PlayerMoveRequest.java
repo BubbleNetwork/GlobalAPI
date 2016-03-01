@@ -7,11 +7,11 @@ import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.PlayerMe
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PlayerMoveRequest extends AbstractMessageObject implements PlayerMessage{
+public class PlayerMoveRequest extends AbstractMessageObject implements PlayerMessage {
     private String name;
     private String to;
 
-    public PlayerMoveRequest(String player,String to) {
+    public PlayerMoveRequest(String player, String to) {
         this.name = player;
         this.to = to;
     }

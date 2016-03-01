@@ -3,7 +3,10 @@ package com.thebubblenetwork.api.global.bubblepackets;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.IPluginMessage;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.MessageType;
 import com.thebubblenetwork.api.global.plugin.BubbleHub;
-import de.mickare.xserver.*;
+import de.mickare.xserver.AbstractXServerManager;
+import de.mickare.xserver.Message;
+import de.mickare.xserver.XServerListener;
+import de.mickare.xserver.XServerManager;
 import de.mickare.xserver.annotations.XEventHandler;
 import de.mickare.xserver.events.XServerDisconnectEvent;
 import de.mickare.xserver.events.XServerLoggedInEvent;
@@ -37,76 +40,85 @@ public class PacketHub implements XServerListener {
 
     private Set<PacketListener> listenerSet = new HashSet<>();
 
-    public PacketHub(){
+    public PacketHub() {
     }
 
-    public void register(BubbleHub<?> plugin){
+    public void register(BubbleHub<?> plugin) {
         this.plugin = plugin;
         try {
             manager = XServerManager.getInstance();
-        }
-        catch (NotInitializedException ex){
+        } catch (NotInitializedException ex) {
             findHard(plugin);
         }
-        manager.getEventHandler().registerListenerUnsafe(plugin.getPlugin(),this);
+        manager.getEventHandler().registerListenerUnsafe(plugin.getPlugin(), this);
         currentserver = getManager().getHomeServer();
         //Setting up fakeservers
-        for(XServer server:getManager().getServers()){
-            if(isValid(server)){
-                onConnect(new XServerLoggedInEvent(server));
+        for (XServer server : getManager().getServers()) {
+            if (isValid(server)) {
+                if(server.isConnected())onConnect(new XServerLoggedInEvent(server));
             }
         }
     }
 
-    private void findHard(BubbleHub<?> plugin){
+    private void findHard(BubbleHub<?> plugin) {
         plugin.logInfo("Could not find XServer instance, using plugin dependency");
         try {
             manager = plugin.getXPlugin().getManager();
-        }
-        catch (NotInitializedException e){
+        } catch (NotInitializedException e) {
             plugin.logSevere("Could not find XServer instance " + e);
             plugin.endSetup("Could not find XServerManager");
         }
     }
 
-    public void sendMessage(XServer server,IPluginMessage message) throws IOException{
-        server.sendMessage(manager.createMessage(message.getType().getName(),message.getBytes()));
+    public void sendMessage(XServer server, IPluginMessage message) throws IOException {
+        server.sendMessage(manager.createMessage(message.getType().getName(), message.getBytes()));
     }
 
-    public void unregisterThis(){
+    public void unregisterThis() {
         getManager().getEventHandler().unregisterListener(this);
     }
 
-    public void registerListener(PacketListener listener){
+    public void registerListener(PacketListener listener) {
         listenerSet.add(listener);
     }
 
-    public void unregisterListener(PacketListener listener){
+    public void unregisterListener(PacketListener listener) {
         listenerSet.remove(listener);
     }
 
     @XEventHandler
-    public void onConnect(XServerLoggedInEvent e){
-        if(!isValid(e.getServer()))return;
-        for(PacketListener listener:listenerSet)listener.onConnect(new PacketInfo(e.getServer(),e.getChannel()));
+    public void onConnect(XServerLoggedInEvent e) {
+        if (!isValid(e.getServer())) {
+            return;
+        }
+        PacketInfo info = new PacketInfo(e.getServer(), e.getChannel());
+        for (PacketListener listener : listenerSet) {
+            listener.onConnect(info);
+        }
     }
 
     @XEventHandler
-    public void onDisconnect(XServerDisconnectEvent e){
-        if(!isValid(e.getServer()))return;
-        for(PacketListener listener:listenerSet)listener.onDisconnect(new PacketInfo(e.getServer(),e.getChannel()));
+    public void onDisconnect(XServerDisconnectEvent e) {
+        if (!isValid(e.getServer())) {
+            return;
+        }
+        PacketInfo info = new PacketInfo(e.getServer(), e.getChannel());
+        for (PacketListener listener : listenerSet) {
+            listener.onDisconnect(info);
+        }
     }
 
     @XEventHandler
-    public void onMessage(XServerMessageIncomingEvent e){
+    public void onMessage(XServerMessageIncomingEvent e) {
         Message m = e.getMessage();
-        if(!isValid(m.getSender()))return;
+        if (!isValid(m.getSender())) {
+            return;
+        }
         MessageType type;
-        try{
+        try {
             Class<?> possibleclass = Class.forName(m.getSubChannel());
             type = MessageType.register(possibleclass.asSubclass(IPluginMessage.class));
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             plugin.logInfo("Could not parse packet in channel: " + m.getSubChannel());
             return;
         }
@@ -117,15 +129,18 @@ public class PacketHub implements XServerListener {
             throwable.printStackTrace();
             return;
         }
-        for(PacketListener listener:listenerSet)listener.onMessage(new PacketInfo(m.getSender(),e.getChannel()),message);
+        PacketInfo info = new PacketInfo(m.getSender(), e.getChannel());
+        for (PacketListener listener : listenerSet) {
+            listener.onMessage(info, message);
+        }
     }
 
-    private String constructInfo(XServer server){
+    private String constructInfo(XServer server) {
         return server.getName() + " @ " + server.getHost() + ":" + String.valueOf(server.getPort()) + " - " + server.getPassword();
     }
 
-    public boolean isValid(XServer server){
-        return server != getCurrentserver() && !server.getName().equals(getCurrentserver().getName()) && server.getPort() != getCurrentserver().getPort();
+    public boolean isValid(XServer server) {
+        return !server.getName().equals(getCurrentserver().getName());
     }
 
     public XServer getCurrentserver() {

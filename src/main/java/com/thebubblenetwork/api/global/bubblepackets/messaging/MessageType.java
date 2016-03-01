@@ -1,9 +1,5 @@
 package com.thebubblenetwork.api.global.bubblepackets.messaging;
 
-import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.handshake.AssignMessage;
-import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.handshake.PlayerCountUpdate;
-import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.request.PlayerDataRequest;
-import com.thebubblenetwork.api.global.bubblepackets.messaging.messages.response.PlayerDataResponse;
 import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
 
 import java.lang.reflect.Constructor;
@@ -17,8 +13,8 @@ import java.util.Set;
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * Wrote by Jacob Evans <jacobevansminor@gmail.com>, 01 2016
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * Class information
  * ---------------------
  * Package: com.thebubblenetwork.bubblebungee.servermanager.messaging
@@ -27,40 +23,45 @@ import java.util.Set;
  */
 
 public class MessageType {
-    private static Set<MessageType> typeSet = new HashSet<>();
-
-    public static MessageType register(Class<? extends IPluginMessage> clazz){
+    public static MessageType register(Class<? extends IPluginMessage> clazz) {
         MessageType type;
-        if((type = getType(clazz)) != null)return type;
-        type = new MessageType(clazz.getName(),clazz);
+        if ((type = getType(clazz)) != null) {
+            return type;
+        }
+        type = new MessageType(clazz.getName(), clazz);
         typeSet.add(type);
         BubbleHubObject.getInstance().logInfo("Registered PacketType " + type.getName());
         return type;
     }
 
-    public static MessageType getType(String s){
-        for(MessageType type:typeSet){
-            if(type.getName().equalsIgnoreCase(s))return type;
+    public static MessageType getType(String s) {
+        for (MessageType type : typeSet) {
+            if (type.getName().equalsIgnoreCase(s)) {
+                return type;
+            }
         }
         return null;
     }
 
-    public static MessageType getType(Class<? extends IPluginMessage> clazz){
-        for(MessageType type:typeSet){
-            if(type.getClazz() == clazz)return type;
+    public static MessageType getType(Class<? extends IPluginMessage> clazz) {
+        for (MessageType type : typeSet) {
+            if (type.getClazz() == clazz) {
+                return type;
+            }
         }
         return null;
     }
 
-    public static MessageType getType(IPluginMessage message){
+    public static MessageType getType(IPluginMessage message) {
         return getType(message.getClass());
     }
 
+    private static Set<MessageType> typeSet = new HashSet<>();
     private String name;
     private Class<? extends IPluginMessage> clazz;
     private Constructor<? extends IPluginMessage> constructor;
 
-    private MessageType(String name,Class<? extends IPluginMessage> clazz){
+    private MessageType(String name, Class<? extends IPluginMessage> clazz) {
         this.name = name;
         this.clazz = clazz;
         try {
@@ -75,23 +76,22 @@ public class MessageType {
         return name;
     }
 
-    public Class<? extends IPluginMessage> getClazz(){
+    public Class<? extends IPluginMessage> getClazz() {
         return clazz;
     }
 
-    public IPluginMessage newInstance(byte[] bytes) throws Throwable{
-        try{
+    public IPluginMessage newInstance(byte[] bytes) throws Throwable {
+        try {
             return constructor.newInstance(new Object[]{bytes});
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             throw ex.getCause();
         }
     }
 
     @Override
-    public boolean equals(Object o){
-        if(o instanceof MessageType){
-            MessageType type = (MessageType)o;
+    public boolean equals(Object o) {
+        if (o instanceof MessageType) {
+            MessageType type = (MessageType) o;
             return type.getName().equalsIgnoreCase(getName()) || type.getClazz().getName().equals(type.getClazz().getName());
         }
         return false;

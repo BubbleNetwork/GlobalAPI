@@ -27,8 +27,7 @@ public class SQLUtil {
     }
 
     private static String query(String table, String variable, Where where) {
-        return "SELECT " + getChar(variable) + variable + getChar(variable) + " FROM `" + table + "` WHERE " + where
-                .getWhere();
+        return "SELECT " + getChar(variable) + variable + getChar(variable) + " FROM `" + table + "` WHERE " + where.getWhere();
     }
 
     private static String update(String table, String variable, Object to, Where where) {
@@ -47,42 +46,38 @@ public class SQLUtil {
                 ")";
     }
 
-    public static boolean execute(SQLConnection connection, String table, Map<String, Object> preset) throws
-            ClassNotFoundException, SQLException {
+    public static boolean execute(SQLConnection connection, String table, Map<String, Object> preset) throws ClassNotFoundException, SQLException {
         return connection.executeSQL(execute(table, preset));
     }
 
-    public static int update(SQLConnection connection, String table, String variable, Object to, Where where) throws
-            ClassNotFoundException, SQLException {
+    public static int update(SQLConnection connection, String table, String variable, Object to, Where where) throws ClassNotFoundException, SQLException {
         return connection.updateSQL(update(table, variable, to, where));
     }
 
-    public static ResultSet query(SQLConnection connection, String table, String variable, Where where) throws
-            ClassNotFoundException, SQLException {
+    public static ResultSet query(SQLConnection connection, String table, String variable, Where where) throws ClassNotFoundException, SQLException {
         return connection.querySQL(query(table, variable, where));
     }
 
-    public static boolean createTable(
-            SQLConnection sql, String table, Map<String, Map.Entry<SQLDataType, Integer>> data) throws
-            ClassNotFoundException, SQLException {
+    public static boolean createTable(SQLConnection sql, String table, Map<String, Map.Entry<SQLDataType, Integer>> data) throws ClassNotFoundException, SQLException {
         return sql.executeSQL(createTable(table, data));
     }
 
-    public static boolean tableExists(SQLConnection connection, String table) throws ClassNotFoundException,
-            SQLException {
+    public static boolean tableExists(SQLConnection connection, String table) throws ClassNotFoundException, SQLException {
         checkAndOpen(connection);
         Connection c = connection.getConnection();
         DatabaseMetaData metaData = c.getMetaData();
         ResultSet rs = metaData.getTables(null, null, table, null);
-        if (rs.next())
+        if (rs.next()) {
             return rs.getRow() == 1;
+        }
         return false;
     }
 
     @Deprecated
     private static void checkAndOpen(SQLConnection connection) throws ClassNotFoundException, SQLException {
-        if (!connection.checkConnection())
+        if (!connection.checkConnection()) {
             connection.openConnection();
+        }
     }
 
     public static String compress(Map<String, Object> data) {
@@ -106,8 +101,9 @@ public class SQLUtil {
     }
 
     private static String getChar(String var) {
-        if (var.equalsIgnoreCase("*"))
+        if (var.equalsIgnoreCase("*")) {
             return "";
+        }
         return "`";
     }
 
@@ -120,8 +116,9 @@ public class SQLUtil {
         }
 
         String append(int max) {
-            if (max == -1)
+            if (max == -1) {
                 return output;
+            }
             return output + "(" + String.valueOf(max) + ")";
         }
     }

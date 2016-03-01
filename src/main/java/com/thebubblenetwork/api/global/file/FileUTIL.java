@@ -15,17 +15,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class FileUTIL {
-    public static boolean deleteDir(File dir) {
+    private static final int BUFFER = 2048;
+
+    public static void deleteDir(File dir) {
         if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
+            for (String child : dir.list()) {
+                deleteDir(new File(dir, child));
             }
         }
-        return dir.delete();
+        if (!dir.delete()) {
+            dir.deleteOnExit();
+        }
     }
 
     public static void copy(File src, File dest) throws IOException {
@@ -66,7 +66,6 @@ public class FileUTIL {
     }
 
     public static void unZip(String zipFile, String extractFolder) throws IOException {
-        int BUFFER = 2048;
         File file = new File(zipFile);
 
         ZipFile zip = new ZipFile(file);

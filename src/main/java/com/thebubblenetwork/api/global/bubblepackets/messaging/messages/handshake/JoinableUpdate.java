@@ -6,7 +6,7 @@ import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageOb
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class JoinableUpdate extends AbstractMessageObject{
+public class JoinableUpdate extends AbstractMessageObject {
     private boolean joinable;
 
     public JoinableUpdate(boolean joinable) {
@@ -25,7 +25,7 @@ public class JoinableUpdate extends AbstractMessageObject{
         out.writeBoolean(joinable);
     }
 
-    public boolean isJoinable(){
+    public boolean isJoinable() {
         return joinable;
     }
 }

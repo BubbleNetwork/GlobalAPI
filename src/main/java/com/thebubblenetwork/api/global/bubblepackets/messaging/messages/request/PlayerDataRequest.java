@@ -21,15 +21,15 @@ import java.io.IOException;
  * Date-created: 25/01/2016 00:14
  * Project: BubblePackets
  */
-public class PlayerDataRequest extends AbstractMessageObject{
+public class PlayerDataRequest extends AbstractMessageObject {
     private String name;
 
-    public PlayerDataRequest(String name){
+    public PlayerDataRequest(String name) {
         super();
         this.name = name;
     }
 
-    public PlayerDataRequest(byte[] bytes){
+    public PlayerDataRequest(byte[] bytes) {
         super(bytes);
     }
 
@@ -42,7 +42,7 @@ public class PlayerDataRequest extends AbstractMessageObject{
         out.writeUTF(name);
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 }

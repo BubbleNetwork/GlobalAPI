@@ -7,8 +7,8 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging;
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * Wrote by Jacob Evans <jacobevansminor@gmail.com>, 01 2016
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * Class information
  * ---------------------
  * Package: com.thebubblenetwork.bubblebungee.servermanager
@@ -18,6 +18,8 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging;
 
 public interface IPluginMessage {
     byte[] getBytes();
+
     void process(byte[] bytes);
+
     MessageType getType();
 }

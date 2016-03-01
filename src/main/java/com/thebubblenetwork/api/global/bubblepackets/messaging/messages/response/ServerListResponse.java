@@ -8,10 +8,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-public class ServerListResponse extends AbstractDataMapMessageObject{
+public class ServerListResponse extends AbstractDataMapMessageObject {
     private String servertype;
 
-    public ServerListResponse(Map<String,String> data,ServerType servertype) {
+    public ServerListResponse(Map<String, String> data, ServerType servertype) {
         super(data);
         this.servertype = servertype.getName();
     }

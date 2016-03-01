@@ -1,12 +1,11 @@
 package com.thebubblenetwork.api.global.plugin.updater;
 
 import com.thebubblenetwork.api.global.file.DownloadUtil;
-import com.thebubblenetwork.api.global.plugin.BubbleHub;
-import com.thebubblenetwork.api.global.plugin.Plugman;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
@@ -14,51 +13,50 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Updatetask extends Thread implements Runnable{
+public abstract class Updatetask extends Thread implements Runnable {
     public static Updatetask instance;
 
     private long start = System.currentTimeMillis();
     private Iterable<FileUpdater> fileUpdaters;
     private Iterable<SQLUpdater> sqlUpdaters;
-    private Map<String,Integer> updatesmap = new HashMap<>();
-    private Map<String,String> updateurls = new HashMap<>();
+    private Map<String, Integer> updatesmap = new HashMap<>();
+    private Map<String, String> updateurls = new HashMap<>();
     private SQLConnection connection;
 
-    protected Updatetask(SQLConnection connection, String table, Iterable<FileUpdater> fileUpdaters, Iterable<SQLUpdater> sqlUpdaters) throws SQLException,ClassNotFoundException{
+    protected Updatetask(SQLConnection connection, String table, Iterable<FileUpdater> fileUpdaters, Iterable<SQLUpdater> sqlUpdaters) throws SQLException, ClassNotFoundException {
         super("UpdateTask");
         this.fileUpdaters = fileUpdaters;
         this.sqlUpdaters = sqlUpdaters;
         ResultSet set = null;
-        try{
-            set = SQLUtil.query(connection,table,"*",new SQLUtil.Where("1"));
-            while (set.next()){
+        try {
+            set = SQLUtil.query(connection, table, "*", new SQLUtil.Where("1"));
+            while (set.next()) {
                 String artifact = set.getString("artifact");
-                updatesmap.put(artifact,set.getInt("version"));
-                updateurls.put(artifact,set.getString("url"));
+                updatesmap.put(artifact, set.getInt("version"));
+                updateurls.put(artifact, set.getString("url"));
             }
-        }
-        finally {
-            if(set != null){
+        } finally {
+            if (set != null) {
                 set.close();
             }
         }
-        this.connection = new SQLConnection(connection.getHostname(),connection.getPort(),connection.getDatabase(),connection.getUser(),connection.getPassword());
+        this.connection = new SQLConnection(connection.getHostname(), connection.getPort(), connection.getDatabase(), connection.getUser(), connection.getPassword());
         start();
     }
 
-    public void run(){
+    public void run() {
         instance = this;
         try {
             this.connection.openConnection();
-        } catch (SQLException|ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             logSevere(e.getMessage());
             logSevere("Could not connect to SQL");
         }
-        final Map<FileUpdater,InputStream> streamMap = new HashMap<>();
-        for(FileUpdater update: fileUpdaters){
-            if(updatesmap.containsKey(update.getArtifact()) && updateurls.containsKey(update.getArtifact())){
+        final Map<FileUpdater, InputStream> streamMap = new HashMap<>();
+        for (FileUpdater update : fileUpdaters) {
+            if (updatesmap.containsKey(update.getArtifact()) && updateurls.containsKey(update.getArtifact())) {
                 int updateto = updatesmap.get(update.getArtifact());
-                if(update.getVersion() < updateto){
+                if (update.getVersion() < updateto) {
                     String url = updateurls.get(update.getArtifact());
                     InputStream stream;
                     try {
@@ -69,17 +67,16 @@ public abstract class Updatetask extends Thread implements Runnable{
                         logSevere("Error - could not download update " + update.getArtifact() + " v" + String.valueOf(updateto));
                         continue;
                     }
-                    streamMap.put(update,stream);
+                    streamMap.put(update, stream);
                 }
             }
         }
 
-        for(SQLUpdater updater: sqlUpdaters){
+        for (SQLUpdater updater : sqlUpdaters) {
             try {
                 updater.update(connection);
                 logInfo("Successfully updated " + updater.getName());
-            }
-            catch (Exception ex){
+            } catch (Exception ex) {
                 logSevere(ex.getMessage());
                 logSevere("Error - could not update " + updater.getName());
             }
@@ -90,10 +87,10 @@ public abstract class Updatetask extends Thread implements Runnable{
             logSevere(e.getMessage());
             logSevere("Could not disconnect from SQL");
         }
-        if(streamMap.size() > 0) {
+        if (streamMap.size() > 0) {
             update(new Runnable() {
                 public void run() {
-                    for(final Map.Entry<FileUpdater,InputStream> update:streamMap.entrySet()) {
+                    for (final Map.Entry<FileUpdater, InputStream> update : streamMap.entrySet()) {
                         new ReloadTask(update.getKey()) {
                             public void whenUnloaded() {
                                 FileUpdater updater = update.getKey();
@@ -122,11 +119,14 @@ public abstract class Updatetask extends Thread implements Runnable{
     }
 
     public abstract void update(Runnable r);
+
     public abstract File getFile();
+
     public abstract void logInfo(String line);
+
     public abstract void logSevere(String line);
 
-    public void onFinish(){
-        logInfo("Completed updating task, this took " + String.valueOf(((double)(System.currentTimeMillis()-start))/1000D) + " seconds");
+    public void onFinish() {
+        logInfo("Completed updating task, this took " + String.valueOf(((double) (System.currentTimeMillis() - start)) / 1000D) + " seconds");
     }
 }

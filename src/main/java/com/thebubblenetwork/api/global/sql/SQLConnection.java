@@ -43,8 +43,7 @@ public class SQLConnection {
             return this.connection;
         }
         Class.forName("com.mysql.jdbc.Driver");
-        this.connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + String.valueOf(this.port) + "/" + this
-                .database, this.user, this.password);
+        this.connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + String.valueOf(this.port) + "/" + this.database, this.user, this.password);
         return this.connection;
     }
 

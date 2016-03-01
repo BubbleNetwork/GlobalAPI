@@ -19,6 +19,8 @@ import com.thebubblenetwork.api.global.bubblepackets.messaging.IPluginMessage;
  */
 public interface PacketListener {
     void onMessage(PacketInfo info, IPluginMessage message);
+
     void onConnect(PacketInfo info);
+
     void onDisconnect(PacketInfo info);
 }
