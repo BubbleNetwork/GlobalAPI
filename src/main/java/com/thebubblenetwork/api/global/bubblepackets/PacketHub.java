@@ -54,7 +54,7 @@ public class PacketHub implements XServerListener {
         currentserver = getManager().getHomeServer();
         //Setting up fakeservers
         for (XServer server : getManager().getServers()) {
-            if (isValid(server)) {
+            if (isValid(server) && server.isConnected()) {
                 if(server.isConnected())onConnect(new XServerLoggedInEvent(server));
             }
         }
