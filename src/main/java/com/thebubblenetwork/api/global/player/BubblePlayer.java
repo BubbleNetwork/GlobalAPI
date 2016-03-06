@@ -3,11 +3,12 @@ package com.thebubblenetwork.api.global.player;
 import com.google.common.base.Joiner;
 import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.PlayerData;
-import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
+import com.thebubblenetwork.api.global.plugin.BubbleHub;
 import com.thebubblenetwork.api.global.ranks.Rank;
 import de.mickare.xserver.util.ChatColor;
 
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Copyright Statement
@@ -24,7 +25,7 @@ import java.util.*;
  * Date-created: 26/01/2016 20:19
  * Project: GlobalAPI
  */
-public abstract class BubblePlayer<T>{
+public abstract class BubblePlayer<T> {
     public static BubblePlayer getObject(UUID u) {
         return playerObjectMap.get(u);
     }
@@ -62,7 +63,7 @@ public abstract class BubblePlayer<T>{
     @SuppressWarnings("unchecked")
     public T getPlayer() {
         if (player == null) {
-            player = (T) (BubbleHubObject.getInstance().getPlayer(getUUID()));
+            player = (T) (BubbleHub.getInstance().getPlayer(getUUID()));
         }
         return player;
     }
@@ -76,7 +77,7 @@ public abstract class BubblePlayer<T>{
         try {
             s = getRankString();
         } catch (InvalidBaseException e) {
-            BubbleHubObject.getInstance().logSevere(e.getMessage());
+            BubbleHub.getInstance().getLogger().log(Level.SEVERE, "Could not get rank string", e);
             return Rank.getDefault();
         }
         return Rank.getRank(s);
@@ -108,13 +109,13 @@ public abstract class BubblePlayer<T>{
         return ranks.toArray(new Rank[0]);
     }
 
+    public void setSubRanks(Rank... subRanks) {
+        setSubRanks(Arrays.asList(subRanks));
+    }
+
     public void setSubRanks(Iterable<Rank> subRanks) {
         setList(PlayerData.SUBRANKS, toStrings(subRanks));
         update();
-    }
-
-    public void setSubRanks(Rank... subRanks) {
-        setSubRanks(Arrays.asList(subRanks));
     }
 
     public UUID[] getFriends() {
@@ -125,13 +126,13 @@ public abstract class BubblePlayer<T>{
         }
     }
 
+    public void setFriends(UUID... friends) {
+        setFriends(Arrays.asList(friends));
+    }
+
     public void setFriends(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDSLIST, toStrings(friends));
         update();
-    }
-
-    public void setFriends(UUID... friends) {
-        setFriends(Arrays.asList(friends));
     }
 
     public UUID[] getFriendIncomingRequests() {
@@ -172,7 +173,7 @@ public abstract class BubblePlayer<T>{
         update();
     }
 
-    public int getKeys(){
+    public int getKeys() {
         Map<String, Integer> currency = getCurrency();
         return currency.containsKey(PlayerData.KEYS) ? currency.get(PlayerData.KEYS) : 0;
     }
@@ -251,8 +252,8 @@ public abstract class BubblePlayer<T>{
         }
     }
 
-    public void setUsingGadgets(boolean usingGadgets){
-        getData().set(PlayerData.GADGETS,usingGadgets);
+    public void setUsingGadgets(boolean usingGadgets) {
+        getData().set(PlayerData.GADGETS, usingGadgets);
         update();
     }
 

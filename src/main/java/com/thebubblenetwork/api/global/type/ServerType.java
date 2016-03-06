@@ -1,9 +1,10 @@
 package com.thebubblenetwork.api.global.type;
 
-import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
+import com.thebubblenetwork.api.global.plugin.BubbleHub;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * The Bubble Network 2016
@@ -15,7 +16,7 @@ import java.util.Set;
 public class ServerType {
     public static ServerType registerType(ServerType type) {
         types.add(type);
-        BubbleHubObject.getInstance().logInfo("Registered servertype: " + type.getName());
+        BubbleHub.getInstance().getLogger().log(Level.INFO, "Registered servertype: {0}", type.getName());
         return type;
     }
 

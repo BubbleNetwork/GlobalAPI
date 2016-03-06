@@ -2,12 +2,13 @@ package com.thebubblenetwork.api.global.bubblepackets.messaging.messages;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.thebubblenetwork.api.global.bubblepackets.messaging.AbstractMessageObject;
-import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
+import com.thebubblenetwork.api.global.plugin.BubbleHub;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Copyright Statement
@@ -48,8 +49,7 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
                     String value = in.readUTF();
                     data.put(key, value);
                 } catch (Exception e) {
-                    BubbleHubObject.getInstance().logSevere(e.getMessage());
-                    BubbleHubObject.getInstance().logSevere("Failed to proccess map object");
+                    BubbleHub.getInstance().getLogger().log(Level.SEVERE, "Failed to serialize data message", e);
                     break;
                 }
             }

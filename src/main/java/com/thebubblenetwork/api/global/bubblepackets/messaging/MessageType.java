@@ -1,7 +1,5 @@
 package com.thebubblenetwork.api.global.bubblepackets.messaging;
 
-import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
-
 import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +28,6 @@ public class MessageType {
         }
         type = new MessageType(clazz.getName(), clazz);
         typeSet.add(type);
-        BubbleHubObject.getInstance().logInfo("Registered PacketType " + type.getName());
         return type;
     }
 

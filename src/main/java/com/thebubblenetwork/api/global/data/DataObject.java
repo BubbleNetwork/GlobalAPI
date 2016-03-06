@@ -1,7 +1,7 @@
 package com.thebubblenetwork.api.global.data;
 
 import com.google.common.base.Joiner;
-import com.thebubblenetwork.api.global.plugin.BubbleHubObject;
+import com.thebubblenetwork.api.global.plugin.BubbleHub;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
 
@@ -68,7 +68,7 @@ public class DataObject {
 
     @SuppressWarnings("unchecked")
     public void save(String table, String var, Object object) throws SQLException, ClassNotFoundException {
-        SQLConnection connection = BubbleHubObject.getInstance().getConnection();
+        SQLConnection connection = BubbleHub.getInstance().getConnection();
         connection.executeSQL("DELETE FROM `" + table + "` WHERE " + new SQLUtil.WhereVar(var, object).getWhere());
         String preset = "INSERT INTO `" + table + "` (`" + var + "`,`key`,`value`) VALUES ";
         Set<String> stringSet = new HashSet<>();

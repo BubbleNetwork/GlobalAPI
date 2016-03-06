@@ -17,6 +17,7 @@ import de.mickare.xserver.net.XServer;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * Copyright Statement
@@ -55,17 +56,19 @@ public class PacketHub implements XServerListener {
         //Setting up fakeservers
         for (XServer server : getManager().getServers()) {
             if (isValid(server) && server.isConnected()) {
-                if(server.isConnected())onConnect(new XServerLoggedInEvent(server));
+                if (server.isConnected()) {
+                    onConnect(new XServerLoggedInEvent(server));
+                }
             }
         }
     }
 
     private void findHard(BubbleHub<?> plugin) {
-        plugin.logInfo("Could not find XServer instance, using plugin dependency");
+        plugin.getLogger().log(Level.INFO, "Could not find XServer instance, using plugin dependency");
         try {
             manager = plugin.getXPlugin().getManager();
         } catch (NotInitializedException e) {
-            plugin.logSevere("Could not find XServer instance " + e);
+            plugin.getLogger().log(Level.WARNING, "Could not find XServer instance ", e);
             plugin.endSetup("Could not find XServerManager");
         }
     }
@@ -119,7 +122,7 @@ public class PacketHub implements XServerListener {
             Class<?> possibleclass = Class.forName(m.getSubChannel());
             type = MessageType.register(possibleclass.asSubclass(IPluginMessage.class));
         } catch (Exception ex) {
-            plugin.logInfo("Could not parse packet in channel: " + m.getSubChannel());
+            plugin.getLogger().log(Level.WARNING, "Could not parse packet in channel: " + m.getSubChannel(), ex);
             return;
         }
         IPluginMessage message;
