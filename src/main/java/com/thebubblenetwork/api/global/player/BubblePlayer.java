@@ -57,7 +57,6 @@ public abstract class BubblePlayer<T> {
         for (Map.Entry<String, String> e : data.entrySet()) {
             getData().getRaw().put(e.getKey(), e.getValue());
         }
-        update();
     }
 
     @SuppressWarnings("unchecked")

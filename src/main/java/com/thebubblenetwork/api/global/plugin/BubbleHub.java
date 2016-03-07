@@ -50,42 +50,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
     private Set<SQLUpdater> sqlUpdaters = new HashSet<>();
 
     public BubbleHub() {
-        getLogger().log(Level.INFO, "Assigning instance...");
         instance = this;
-        addUpdater(this);
-        addUpdater(new SQLUpdater() {
-            public void update(SQLConnection connection) throws SQLException, ClassNotFoundException {
-                ResultSet set = null;
-                try {
-                    set = SQLUtil.query(getConnection(), "servertypes", "*", new SQLUtil.Where("1"));
-                    final Set<ServerType> serverTypeObjects = new HashSet<>();
-                    while (set.next()) {
-                        serverTypeObjects.add(new ServerType(set.getString("name"), set.getString("prefix"), set.getInt("maxplayer"), set.getInt("low-limit"), set.getInt("high-limit")));
-                    }
-                    runTaskLater(new Runnable() {
-                        public void run() {
-                            synchronized (ServerType.getTypes()) {
-                                ServerType.getTypes().clear();
-                                for (ServerType serverType : serverTypeObjects) {
-                                    ServerType.registerType(serverType);
-                                }
-                            }
-                        }
-                    }, 0L, TimeUnit.MILLISECONDS);
-                } finally {
-                    try {
-                        if (set != null) {
-                            set.close();
-                        }
-                    } catch (Throwable throwable) {
-                    }
-                }
-            }
-
-            public String getName() {
-                return "ServerTypeUpdater";
-            }
-        });
     }
 
     public final void onEnable() {
@@ -187,6 +152,43 @@ public abstract class BubbleHub<P> implements FileUpdater {
     }
 
     public final void onLoad() {
+        getLogger().log(Level.INFO,"Adding updaters");
+
+        addUpdater(this);
+        addUpdater(new SQLUpdater() {
+            public void update(SQLConnection connection) throws SQLException, ClassNotFoundException {
+                ResultSet set = null;
+                try {
+                    set = SQLUtil.query(getConnection(), "servertypes", "*", new SQLUtil.Where("1"));
+                    final Set<ServerType> serverTypeObjects = new HashSet<>();
+                    while (set.next()) {
+                        serverTypeObjects.add(new ServerType(set.getString("name"), set.getString("prefix"), set.getInt("maxplayer"), set.getInt("low-limit"), set.getInt("high-limit")));
+                    }
+                    runTaskLater(new Runnable() {
+                        public void run() {
+                            synchronized (ServerType.getTypes()) {
+                                ServerType.getTypes().clear();
+                                for (ServerType serverType : serverTypeObjects) {
+                                    ServerType.registerType(serverType);
+                                }
+                            }
+                        }
+                    }, 0L, TimeUnit.MILLISECONDS);
+                } finally {
+                    try {
+                        if (set != null) {
+                            set.close();
+                        }
+                    } catch (Throwable throwable) {
+                    }
+                }
+            }
+
+            public String getName() {
+                return "ServerTypeUpdater";
+            }
+        });
+
         //Loading properties
         getLogger().log(Level.INFO, "Loading SQL Properties");
 
