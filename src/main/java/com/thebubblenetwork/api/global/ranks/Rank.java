@@ -5,6 +5,7 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.RankData;
 import de.mickare.xserver.util.ChatColor;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -37,18 +38,16 @@ public class Rank {
     }
 
     public static void loadRank(String name, Map<String, String> map) {
-        Rank r;
-        if ((r = getRank(name)) != null) {
-            if (map == null) {
-                ranks.remove(r);
-            } else {
-                r.getData().getRaw().clear();
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    r.getData().getRaw().put(entry.getKey(), entry.getValue());
-                }
-            }
+        Rank r = getRank(name);
+        //If the rank exists remove it
+        if (r != null) {
+            ranks.remove(r);
         }
-        ranks.add(new Rank(name, new RankData(map)));
+        //If the rank has data re-create it
+        if(map != null){
+            r = new Rank(name,new RankData(new HashMap<>(map)));
+            ranks.add(r);
+        }
     }
 
     private static boolean isAuthorized(Rank r, String indentifier) {
