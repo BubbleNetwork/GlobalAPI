@@ -97,6 +97,14 @@ public class DataObject {
         }
     }
 
+    public void set(String s, Number i) {
+        if (i == null) {
+            getRaw().remove(s);
+        } else {
+            getRaw().put(s, String.valueOf(i));
+        }
+    }
+
     public void set(String s, Boolean b) {
         if (b == null) {
             getRaw().remove(s);
