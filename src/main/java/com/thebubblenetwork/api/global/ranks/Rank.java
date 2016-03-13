@@ -5,10 +5,7 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.RankData;
 import de.mickare.xserver.util.ChatColor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Jacob on 31/12/2015.
@@ -72,7 +69,7 @@ public class Rank {
         return d;
     }
 
-    private static Set<Rank> ranks = new HashSet<>();
+    private static Set<Rank> ranks = Collections.synchronizedSet(new HashSet<Rank>());
     private RankData data;
     private String name;
 
