@@ -142,43 +142,52 @@ public abstract class BubblePlayer<T> {
         }
     }
 
-    public Map<String, Integer> getStats(String game) {
-        return getData().getMap(PlayerData.STATSBASE, game);
+    public double getStats(String game, String stat) {
+        try {
+            return getData().getNumber(PlayerData.STATSBASE + "." + game + "." + stat).doubleValue();
+        } catch (InvalidBaseException e) {
+            return 0D;
+        }
     }
 
-    public Map<String, Integer> getKits(String game) {
-        return getData().getMap(PlayerData.KITBASE, game);
+    public int getKit(String game, String kit) {
+        try {
+            return getData().getNumber(PlayerData.STATSBASE + "." + game + "." + kit).intValue();
+        } catch (InvalidBaseException e) {
+            return 0;
+        }
     }
 
-    public Map<String, Integer> getHubItems() {
-        return getData().getMapRaw(PlayerData.ITEMSBASE);
+    public int getHubItem(String item) {
+        try {
+            return getData().getNumber(PlayerData.ITEMSBASE + "." + item).intValue();
+        } catch (InvalidBaseException e) {
+            return 0;
+        }
     }
-
-    public Map<String, Integer> getPacks() {
-        return getData().getMapRaw(PlayerData.PACKS);
-    }
-
-    public Map<String, Integer> getCurrency() {
-        return getData().getMapRaw(PlayerData.CURRENCYBASE);
-    }
-
     public int getTokens() {
-        Map<String, Integer> currency = getCurrency();
-        return currency.containsKey(PlayerData.TOKENS) ? currency.get(PlayerData.TOKENS) : 0;
+        try {
+            return getData().getNumber(PlayerData.TOKENS).intValue();
+        } catch (InvalidBaseException e) {
+            return 0;
+        }
     }
 
     public void setTokens(int tokens) {
-        getData().set(PlayerData.CURRENCYBASE + "." + PlayerData.TOKENS, tokens);
+        getData().set(PlayerData.TOKENS, tokens);
         update();
     }
 
     public int getKeys() {
-        Map<String, Integer> currency = getCurrency();
-        return currency.containsKey(PlayerData.KEYS) ? currency.get(PlayerData.KEYS) : 0;
+        try {
+            return getData().getNumber(PlayerData.KEYS).intValue();
+        } catch (InvalidBaseException e) {
+            return 0;
+        }
     }
 
     public void setKeys(int keys) {
-        getData().set(PlayerData.CURRENCYBASE + "." + PlayerData.KEYS, keys);
+        getData().set(PlayerData.KEYS, keys);
         update();
     }
 
@@ -218,12 +227,7 @@ public abstract class BubblePlayer<T> {
     }
 
     public void setHubItem(String item, int id) {
-        getData().set(PlayerData.ITEMSBASE + ".item", id);
-        update();
-    }
-
-    public void setPacks(String pack, int amount) {
-        getData().set(PlayerData.PACKS + "." + pack, amount);
+        getData().set(PlayerData.ITEMSBASE + "." + item, id);
         update();
     }
 
