@@ -1,5 +1,6 @@
 package com.thebubblenetwork.api.global.ranks;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.RankData;
@@ -48,14 +49,19 @@ public class Rank {
     }
 
     private static boolean isAuthorized(Rank r, String indentifier) {
-        try {
-            return isAuthorizedPrimative(r, indentifier).decision();
-        } catch (UnsupportedOperationException e1) {
-            try {
-                return isAuthorizedPrimative(r, "*").decision();
-            } catch (UnsupportedOperationException e2) {
-                return r.getInheritance() != null && isAuthorized(r, indentifier);
-            }
+        String[] args = indentifier.split("\\.");
+        String current = "*";
+        Decision d = isAuthorizedPrimative(r, indentifier);
+        for(String s: args){
+            if(d != Decision.CONTINUE)break;
+            d = isAuthorizedPrimative(r, current);
+            current = current.replace("*",s + ".*");
+        }
+        try{
+            return d.decision();
+        }
+        catch (UnsupportedOperationException ex){
+            return r.getInheritance() != null && isAuthorized(r.getInheritance(), indentifier);
         }
     }
 

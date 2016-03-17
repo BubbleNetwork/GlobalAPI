@@ -165,6 +165,16 @@ public abstract class BubblePlayer<T> {
             return 0;
         }
     }
+
+    public boolean getHubItemUsable(String item){
+        try{
+            return getData().getBoolean(PlayerData.ITEMALLOWED + "." + item);
+        }
+        catch (InvalidBaseException e){
+            return isAuthorized("ultracosmetics." + item);
+        }
+    }
+
     public int getTokens() {
         try {
             return getData().getNumber(PlayerData.TOKENS).intValue();
@@ -229,6 +239,10 @@ public abstract class BubblePlayer<T> {
     public void setHubItem(String item, int id) {
         getData().set(PlayerData.ITEMSBASE + "." + item, id);
         update();
+    }
+
+    public void setHubItemUsable(String item, boolean b){
+        getData().set(PlayerData.ITEMALLOWED + "." + item,b);
     }
 
     public void setNick(String nick) {
