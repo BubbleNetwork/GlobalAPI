@@ -8,6 +8,8 @@ import com.thebubblenetwork.api.global.plugin.updater.Updatetask;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
 import com.thebubblenetwork.api.global.type.ServerType;
+import com.thebubblenetwork.api.global.website.NamelessAPI;
+import com.thebubblenetwork.api.global.website.NamelessAPISettings;
 import de.mickare.xserver.XServerPlugin;
 
 import java.io.File;
@@ -48,6 +50,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
     private PacketHub hub;
     private Set<FileUpdater> fileupdaters = new HashSet<>();
     private Set<SQLUpdater> sqlUpdaters = new HashSet<>();
+    private NamelessAPI api;
 
     public BubbleHub() {
         instance = this;
@@ -139,6 +142,13 @@ public abstract class BubbleHub<P> implements FileUpdater {
             getLogger().log(Level.SEVERE, "Could not close database connection", e);
         }
 
+        try{
+            api.getConnection().closeConnection();
+        }
+        catch (SQLException e){
+            getLogger().log(Level.SEVERE, "Could not close nameless database connection", e);
+        }
+
         getPacketHub().unregisterThis();
 
         if (Updatetask.instance != null) {
@@ -195,12 +205,10 @@ public abstract class BubbleHub<P> implements FileUpdater {
         if (!sqlpropertiesfile.exists()) {
 
             try {
-                PropertiesFile.generateFresh(sqlpropertiesfile, new String[]{"hostname", "port", "username", "password", "database"}, new String[]{"localhost", "3306", "root", "NONE", "bubbleserver"});
+                PropertiesFile.generateFresh(sqlpropertiesfile, new String[]{"hostname", "port", "username", "password", "database", "site-hostname","site-port", "site-username", "site-password","site-database"}, new String[]{"localhost", "3306", "root", "NONE", "bubbleserver", "thebubblenetwork.com", "3306", "site","NONE","thebubbl_site"});
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "Could not generate fresh properties file");
             }
-            endSetup("Could not find properties file");
-        } else {
             try {
                 sqlproperties = new PropertiesFile(sqlpropertiesfile);
             } catch (Exception e) {
@@ -209,6 +217,13 @@ public abstract class BubbleHub<P> implements FileUpdater {
             }
         }
 
+        //Setting up nameless api
+
+        try {
+            api = new NamelessAPI(new NamelessAPISettings(sqlproperties.getString("site-hostname"), sqlproperties.getNumber("site-port").intValue(), sqlproperties.getString("site-username"), sqlproperties.getString("site-password"), sqlproperties.getString("site-database")));
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE,"Could not setup nameless api");
+        }
 
         getLogger().log(Level.INFO, "Finding database information...");
 
@@ -274,6 +289,10 @@ public abstract class BubbleHub<P> implements FileUpdater {
         onBubbleLoad();
 
         getLogger().log(Level.INFO, "Load complete");
+    }
+
+    public NamelessAPI getNameless(){
+        return api;
     }
 
     public SQLConnection getConnection() {

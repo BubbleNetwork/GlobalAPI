@@ -5,6 +5,7 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.PlayerData;
 import com.thebubblenetwork.api.global.plugin.BubbleHub;
 import com.thebubblenetwork.api.global.ranks.Rank;
+import com.thebubblenetwork.api.global.website.NamelessUser;
 import de.mickare.xserver.util.ChatColor;
 
 import java.util.*;
@@ -38,10 +39,12 @@ public abstract class BubblePlayer<T> {
     private UUID u;
     private PlayerData data;
     private T player;
+    private NamelessUser user;
 
     protected BubblePlayer(UUID u, PlayerData data) {
         this.u = u;
         this.data = data;
+        user = new NamelessUser(BubbleHub.getInstance().getNameless(), u);
     }
 
     public UUID getUUID() {
@@ -272,6 +275,10 @@ public abstract class BubblePlayer<T> {
     public void setUsingGadgets(boolean usingGadgets) {
         getData().set(PlayerData.GADGETS, usingGadgets);
         update();
+    }
+
+    public NamelessUser getNamelessUser() {
+        return user;
     }
 
     public abstract String getName();
