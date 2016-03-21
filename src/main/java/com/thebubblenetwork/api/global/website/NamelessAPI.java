@@ -75,7 +75,7 @@ public class NamelessAPI {
     }
 
     public SQLConnection getConnection(){
-        return getConnection();
+        return deprecated;
     }
 
     public static boolean isEmail(String email){
