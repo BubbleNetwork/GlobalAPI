@@ -155,7 +155,7 @@ public abstract class BubblePlayer<T> {
 
     public int getKit(String game, String kit) {
         try {
-            return getData().getNumber(PlayerData.STATSBASE + "." + game + "." + kit).intValue();
+            return getData().getNumber(PlayerData.KITBASE + "." + game + "." + kit).intValue();
         } catch (InvalidBaseException e) {
             return 0;
         }
