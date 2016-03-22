@@ -277,6 +277,10 @@ public abstract class BubblePlayer<T> {
         update();
     }
 
+    public boolean canAfford(int tokens){
+        return getTokens()-tokens > 0;
+    }
+
     public NamelessUser getNamelessUser() {
         return user;
     }
