@@ -28,7 +28,7 @@ public class FTPConnection {
 
     public void login(String username, String password) throws FtpProtocolException, IOException{
         if(isConnected()) {
-            client.login(username, password.toCharArray());
+            client.login(username, password == null ? null : password.toCharArray());
         }
     }
 

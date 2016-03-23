@@ -45,7 +45,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
     }
 
     private static BubbleHub<?> instance;
-    private final File sqlpropertiesfile = new File("sql.properties");
+    private final File sqlpropertiesfile = new File("connect.properties");
     private PropertiesFile sqlproperties;
     private SQLConnection connection;
     private FTPConnection ftp;
@@ -170,7 +170,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
         if (!sqlpropertiesfile.exists()) {
 
             try {
-                PropertiesFile.generateFresh(sqlpropertiesfile, new String[]{"hostname", "port", "username", "password", "database", "site-hostname","site-port", "site-username", "site-password","site-database","ftp-ip","ftp-port"}, new String[]{"localhost", "3306", "root", "NONE", "bubbleserver", "thebubblenetwork.com", "3306", "site","NONE","thebubbl_site","localhost","21"});
+                PropertiesFile.generateFresh(sqlpropertiesfile, new String[]{"hostname", "port", "username", "password", "database", "site-hostname","site-port", "site-username", "site-password","site-database","ftp-ip","ftp-port","ftp-user","ftp-password"}, new String[]{"localhost", "3306", "root", "NONE", "bubbleserver", "thebubblenetwork.com", "3306", "site","NONE","thebubbl_site","localhost","21","root","NONE"});
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "Could not generate fresh properties file");
             }
@@ -229,6 +229,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
         //Connecting to FTP
         try{
             getFTP().connect();
+            getFTP().login(sqlproperties.getString("ftp-user"), (temp = sqlproperties.getString("ftp-password")).equals("NONE") ? null : temp);
         }
         catch (Exception ex){
             getLogger().log(Level.WARNING, "Could not connect to FTP", ex);

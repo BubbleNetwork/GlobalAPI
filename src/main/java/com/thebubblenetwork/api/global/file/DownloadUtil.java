@@ -31,8 +31,8 @@ public class DownloadUtil {
         Files.copy(download(address,connection), to.toPath(), option);
     }
 
-    public static void download(File to, String address, FTPConnection connection){
-        download(to, address, connection);
+    public static void download(File to, String address, FTPConnection connection) throws IOException{
+        download(to, address, connection, StandardCopyOption.REPLACE_EXISTING);
     }
 
     public static InputStream download(String file, FTPConnection connection){
