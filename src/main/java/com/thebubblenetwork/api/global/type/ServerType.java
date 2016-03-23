@@ -34,15 +34,16 @@ public class ServerType {
     }
 
     private static Set<ServerType> types = new HashSet<>();
-    private String name, prefix;
+    private String name, prefix, download;
     private int maxplayers, lowlimit, highlimit;
 
-    public ServerType(String name, String prefix, int maxplayers, int lowlimit, int highlimit) {
+    public ServerType(String name, String prefix, String download,int maxplayers, int lowlimit, int highlimit) {
         this.name = name;
         this.highlimit = highlimit;
         this.lowlimit = lowlimit;
         this.maxplayers = maxplayers;
         this.prefix = prefix;
+        this.download = download;
     }
 
     public String getName() {
@@ -51,6 +52,10 @@ public class ServerType {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public String getDownload() {
+        return download;
     }
 
     public int getMaxPlayers() {
