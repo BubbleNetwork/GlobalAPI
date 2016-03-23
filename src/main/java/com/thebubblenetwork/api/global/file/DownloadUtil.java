@@ -1,6 +1,10 @@
 package com.thebubblenetwork.api.global.file;
 
+import com.thebubblenetwork.api.global.ftp.FTPConnection;
+import sun.net.ftp.FtpProtocolException;
+
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.CopyOption;
@@ -21,5 +25,24 @@ public class DownloadUtil {
 
     public static InputStream download(String address) throws Exception {
         return new URL(address).openStream();
+    }
+
+    public static void download(File to, String address, FTPConnection connection, CopyOption option) throws IOException{
+        Files.copy(download(address,connection), to.toPath(), option);
+    }
+
+    public static void download(File to, String address, FTPConnection connection){
+        download(to, address, connection);
+    }
+
+    public static InputStream download(String file, FTPConnection connection){
+        if(connection.isLoggedIn()){
+            try {
+                return connection.getClient().getFileStream(file);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        throw new IllegalArgumentException("Not logged in");
     }
 }

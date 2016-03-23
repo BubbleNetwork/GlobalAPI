@@ -2,6 +2,7 @@ package com.thebubblenetwork.api.global.plugin;
 
 import com.thebubblenetwork.api.global.bubblepackets.PacketHub;
 import com.thebubblenetwork.api.global.file.PropertiesFile;
+import com.thebubblenetwork.api.global.ftp.FTPConnection;
 import com.thebubblenetwork.api.global.plugin.updater.FileUpdater;
 import com.thebubblenetwork.api.global.plugin.updater.SQLUpdater;
 import com.thebubblenetwork.api.global.plugin.updater.Updatetask;
@@ -47,6 +48,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
     private final File sqlpropertiesfile = new File("sql.properties");
     private PropertiesFile sqlproperties;
     private SQLConnection connection;
+    private FTPConnection ftp;
     private PacketHub hub;
     private Set<FileUpdater> fileupdaters = new HashSet<>();
     private Set<SQLUpdater> sqlUpdaters = new HashSet<>();
@@ -168,7 +170,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
         if (!sqlpropertiesfile.exists()) {
 
             try {
-                PropertiesFile.generateFresh(sqlpropertiesfile, new String[]{"hostname", "port", "username", "password", "database", "site-hostname","site-port", "site-username", "site-password","site-database"}, new String[]{"localhost", "3306", "root", "NONE", "bubbleserver", "thebubblenetwork.com", "3306", "site","NONE","thebubbl_site"});
+                PropertiesFile.generateFresh(sqlpropertiesfile, new String[]{"hostname", "port", "username", "password", "database", "site-hostname","site-port", "site-username", "site-password","site-database","ftp-ip","ftp-port"}, new String[]{"localhost", "3306", "root", "NONE", "bubbleserver", "thebubblenetwork.com", "3306", "site","NONE","thebubbl_site","localhost","21"});
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "Could not generate fresh properties file");
             }
@@ -192,6 +194,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
 
         getLogger().log(Level.INFO, "Finding database information...");
 
+        //SQL info
         try {
             connection = new SQLConnection(sqlproperties.getString("hostname"), sqlproperties.getNumber("port").intValue(), sqlproperties.getString("database"), sqlproperties.getString("username"), (temp = sqlproperties.getString("password")).equals("NONE") ? null : temp);
         } catch (ParseException ex) {
@@ -199,6 +202,17 @@ public abstract class BubbleHub<P> implements FileUpdater {
             endSetup("Invalid database port");
         } catch (Exception ex) {
             getLogger().log(Level.WARNING, "Could not load database information", ex);
+            endSetup("Invalid configuration");
+        }
+
+        //FTP info
+        try{
+            ftp = new FTPConnection(sqlproperties.getString("ftp-ip"), sqlproperties.getNumber("ftp-port").intValue());
+        } catch (ParseException ex) {
+            getLogger().log(Level.WARNING, "Could not load ftp information", ex);
+            endSetup("Invalid ftp port");
+        } catch (Exception ex) {
+            getLogger().log(Level.WARNING, "Could not load ftp information", ex);
             endSetup("Invalid configuration");
         }
 
@@ -212,13 +226,22 @@ public abstract class BubbleHub<P> implements FileUpdater {
             endSetup("Could not establish connection to database");
         }
 
+        //Connecting to FTP
+        try{
+            getFTP().connect();
+        }
+        catch (Exception ex){
+            getLogger().log(Level.WARNING, "Could not connect to FTP", ex);
+            endSetup("Could not establish connection to ftp");
+        }
+
+
         //Loading server types
 
         getLogger().log(Level.INFO, "Finding server types...");
 
         try {
             if (!SQLUtil.tableExists(getConnection(), "servertypes")) {
-                //TODO - SQL API
                 connection.executeSQL("CREATE TABLE `servertypes` (" +
                         "`name` VARCHAR(32) NOT NULL," +
                         "`prefix` VARCHAR(16) NOT NULL," +
@@ -304,8 +327,12 @@ public abstract class BubbleHub<P> implements FileUpdater {
         return connection;
     }
 
-    public PropertiesFile getSQLProperties() {
+    public PropertiesFile getProperties() {
         return sqlproperties;
+    }
+
+    public FTPConnection getFTP(){
+        return ftp;
     }
 
     public PacketHub getPacketHub() {
