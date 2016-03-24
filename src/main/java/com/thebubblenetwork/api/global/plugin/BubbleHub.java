@@ -14,6 +14,7 @@ import com.thebubblenetwork.api.global.website.NamelessAPISettings;
 import de.mickare.xserver.XServerPlugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -142,6 +143,15 @@ public abstract class BubbleHub<P> implements FileUpdater {
             getConnection().closeConnection();
         } catch (SQLException e) {
             getLogger().log(Level.SEVERE, "Could not close database connection", e);
+        }
+
+        try{
+            if(getFTP().isConnected()){
+                getFTP().close();
+            }
+        }
+        catch (IOException ex){
+            getLogger().log(Level.SEVERE, "Could not close FTP connection", ex);
         }
 
         try{
