@@ -74,6 +74,24 @@ public class NamelessAPI {
         }
     }
 
+    public boolean isRegisteredEmail(String email){
+        ResultSet set = null;
+        try {
+            set =  SQLUtil.query(deprecated, NamelessAPISettings.USER_TABLE, "*", new SQLUtil.WhereVar(NamelessAPISettings.EMAIL, email));
+            return set.next();
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (set != null) {
+                try{
+                    set.close();
+                }
+                catch (Exception ex) {
+                }
+            }
+        }
+    }
+
     public SQLConnection getConnection(){
         return deprecated;
     }

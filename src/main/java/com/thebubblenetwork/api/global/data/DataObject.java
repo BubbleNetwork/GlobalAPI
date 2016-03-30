@@ -112,4 +112,8 @@ public class DataObject {
             getRaw().put(s, String.valueOf(b));
         }
     }
+
+    public void remove(String s){
+        getRaw().remove(s);
+    }
 }

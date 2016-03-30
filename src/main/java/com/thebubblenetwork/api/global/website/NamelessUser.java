@@ -131,4 +131,12 @@ public class NamelessUser {
         Object[] objects = getSafe(NamelessAPISettings.JOINED,NamelessAPISettings.ONLINE);
         return (int)objects[1] != (int)objects[0];
     }
+
+    public String getEmail(){
+        return (String)getSafe(NamelessAPISettings.EMAIL)[0];
+    }
+
+    public void setEmail(String email){
+        setSafe(NamelessAPISettings.EMAIL, email);
+    }
 }

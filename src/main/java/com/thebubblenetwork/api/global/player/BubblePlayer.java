@@ -277,6 +277,42 @@ public abstract class BubblePlayer<T> {
         update();
     }
 
+    public void unban(){
+        getData().remove(PlayerData.BANNED);
+        getData().remove(PlayerData.BANTIME);
+        getData().remove(PlayerData.BANREASON);
+        getData().remove(PlayerData.BANBY);
+    }
+
+    public void ban(Date unbanby, String reason, String by){
+        getData().set(PlayerData.BANNED, true);
+        getData().set(PlayerData.BANTIME, unbanby.getTime());
+        getData().set(PlayerData.BANREASON, reason);
+        getData().set(PlayerData.BANBY, by);
+    }
+
+    public boolean isBanned(){
+        try{
+            if(getData().getBoolean(PlayerData.BANNED)){
+                if(new Date(getData().getNumber(PlayerData.BANTIME).longValue()).before(new Date())){
+                    unban();
+                }
+                else return true;
+            }
+        }
+        catch (InvalidBaseException ex){
+        }
+        return false;
+    }
+
+    public Date getUnbanDate(){
+        try {
+            return new Date(getData().getNumber(PlayerData.BANTIME).longValue());
+        } catch (InvalidBaseException e) {
+            return null;
+        }
+    }
+
     public boolean canAfford(int tokens){
         return getTokens()-tokens > 0;
     }
