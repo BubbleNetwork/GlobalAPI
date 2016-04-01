@@ -12,12 +12,11 @@ public class FTPConnection {
     private FTPClient client = new FTPClient();
     private InetAddress address;
     private String ip;
-    private int port;
+    private byte[] port;
 
-    public FTPConnection(String ip, int port){
+    public FTPConnection(String ip, byte[] port){
         try {
-            address = InetAddress.getByName(ip);
-            this.port = port;
+            address = InetAddress.getByAddress(ip, port);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -32,7 +31,7 @@ public class FTPConnection {
     }
 
     public void connect() throws FTPConnectionClosedException, IOException{
-        client.connect(address, port);
+        client.connect(address);
     }
 
     public void login(String username, String password) throws FTPConnectionClosedException, IOException{
