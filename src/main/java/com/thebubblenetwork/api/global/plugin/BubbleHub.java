@@ -45,6 +45,8 @@ public abstract class BubbleHub<P> implements FileUpdater {
         return instance;
     }
 
+    private static boolean shutdown = false;
+
     private static BubbleHub<?> instance;
     private final File sqlpropertiesfile = new File("connect.properties");
     private PropertiesFile sqlproperties;
@@ -382,7 +384,10 @@ public abstract class BubbleHub<P> implements FileUpdater {
 
     public void endSetup(String s) {
         getLogger().log(Level.SEVERE, s);
-        stop();
+        if(!shutdown) {
+            stop();
+            shutdown = true;
+        }
         throw new IllegalArgumentException("Disabling... " + s);
     }
 
