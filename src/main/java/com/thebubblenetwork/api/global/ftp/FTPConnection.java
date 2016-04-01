@@ -13,14 +13,19 @@ public class FTPConnection {
     private InetAddress address;
     private String ip;
     private int port;
+    private String user;
+    private String pass;
 
-    public FTPConnection(String ip, int port){
+    public FTPConnection(String ip, int port, String user, String pass){
         try {
             address = InetAddress.getByName(ip);
-            this.port = port;
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+        this.ip = ip;
+        this.port = port;
+        this.user = user;
+        this.pass = pass;
     }
 
     public boolean isConnected(){
@@ -35,9 +40,9 @@ public class FTPConnection {
         client.connect(address, port);
     }
 
-    public void login(String username, String password) throws FTPConnectionClosedException, IOException{
+    public void login() throws FTPConnectionClosedException, IOException{
         if(isConnected()) {
-            client.login(username, password);
+            client.login(user, pass);
         }
     }
 

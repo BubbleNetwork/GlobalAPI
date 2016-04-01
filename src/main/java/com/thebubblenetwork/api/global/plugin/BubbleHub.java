@@ -219,7 +219,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
 
         //FTP info
         try{
-            ftp = new FTPConnection(sqlproperties.getString("ftp-ip"), sqlproperties.getNumber("ftp-port").intValue());
+            ftp = new FTPConnection(sqlproperties.getString("ftp-ip"), sqlproperties.getNumber("ftp-port").intValue(), sqlproperties.getString("ftp-user"), (temp = sqlproperties.getString("ftp-password")).equals("NONE") ? null : temp);
         } catch (ParseException ex) {
             getLogger().log(Level.WARNING, "Could not load ftp information", ex);
             endSetup("Invalid ftp port");
@@ -241,7 +241,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
         //Connecting to FTP
         try{
             getFTP().connect();
-            getFTP().login(sqlproperties.getString("ftp-user"), (temp = sqlproperties.getString("ftp-password")).equals("NONE") ? null : temp);
+            getFTP().login();
         }
         catch (Exception ex){
             getLogger().log(Level.WARNING, "Could not connect to FTP", ex);
