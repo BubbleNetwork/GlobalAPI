@@ -38,7 +38,7 @@ public class DownloadUtil {
     public static InputStream download(String file, FTPConnection connection){
         if(connection.isLoggedIn()){
             try {
-                return connection.getClient().getFileStream(file);
+                return connection.getClient().retrieveFileStream(file);
             } catch (Exception e) {
                 throw new IllegalArgumentException(e);
             }
