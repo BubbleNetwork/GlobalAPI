@@ -264,9 +264,9 @@ public abstract class BubbleHub<P> implements FileUpdater {
                         "`high-limit` INT(3) NOT NULL," +
                         "PRIMARY KEY (`name`)," +
                         "UNIQUE INDEX `UNIQUE` (`name`, `prefix`)," +
-                        "UNIQUE INDEX `DOWNLOADUNIQUE` (`download`)" +
+                        "UNIQUE INDEX `DOWNLOADUNIQUE` (`download`)," +
                         "INDEX `NAME KEY` (`name`)," +
-                        "INDEX `PREFIX` (`prefix`)" +
+                        "INDEX `PREFIX` (`prefix`)," +
                         "INDEX `DOWNLOAD` (`download`)" +
                         ")" +
                         ";");
