@@ -1,17 +1,25 @@
 package com.thebubblenetwork.api.global.ftp;
 
-import sun.net.ftp.FtpClient;
-import sun.net.ftp.FtpProtocolException;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class FTPConnection {
-    private FtpClient client = null;
-    private InetSocketAddress address;
+    private FTPClient client = new FTPClient();
+    private InetAddress address;
+    private String ip;
+    private byte[] port;
 
-    public FTPConnection(String ip, int port){
-        address = new InetSocketAddress(ip, port);
+    public FTPConnection(String ip, byte[] port){
+        try {
+            address = InetAddress.getByAddress(ip, port);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isConnected(){
@@ -19,40 +27,41 @@ public class FTPConnection {
     }
 
     public boolean isLoggedIn(){
-        return isConnected() && client.isLoggedIn();
+        return isConnected() && client.isConnected();
     }
 
-    public void connect() throws FtpProtocolException, IOException{
-        client = FtpClient.create(address);
+    public void connect() throws FTPConnectionClosedException, IOException{
+        client.connect(address);
     }
 
-    public void login(String username, String password) throws FtpProtocolException, IOException{
+    public void login(String username, String password) throws FTPConnectionClosedException, IOException{
         if(isConnected()) {
-            client.login(username, password == null ? null : password.toCharArray());
+            client.login(username, password);
         }
     }
 
-    public void abort() throws IOException, FtpProtocolException{
+    public void abort() throws IOException, FTPConnectionClosedException{
         if(isConnected()){
             client.abort();
             close();
         }
     }
 
-    public FtpClient getClient(){
+    public FTPClient getClient(){
         return client;
     }
 
     public void close() throws IOException{
         try {
-            client.close();
+            //disconnect the ftp session
+            client.disconnect();
         }
         finally {
             client = null;
         }
     }
 
-    public InetSocketAddress getAddress(){
+    public InetAddress getAddress(){
         return address;
     }
 }
