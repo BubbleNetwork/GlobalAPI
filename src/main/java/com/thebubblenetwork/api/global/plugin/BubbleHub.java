@@ -258,7 +258,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
                 connection.executeSQL("CREATE TABLE `servertypes` (" +
                         "`name` VARCHAR(32) NOT NULL," +
                         "`prefix` VARCHAR(16) NOT NULL," +
-                        "`download` VARCHAR(2555) NOT NULL" +
+                        "`download` VARCHAR(2555) NOT NULL," +
                         "`maxplayer` INT(3) NOT NULL," +
                         "`low-limit` INT(3) NOT NULL," +
                         "`high-limit` INT(3) NOT NULL," +
