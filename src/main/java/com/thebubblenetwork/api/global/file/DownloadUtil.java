@@ -15,19 +15,23 @@ import java.nio.file.StandardCopyOption;
  * Created by Jacob on 13/12/2015.
  */
 public class DownloadUtil {
-    public static void download(File to, String address, CopyOption option) throws Exception {
+    public static void download(File to, String address, CopyOption option) throws IOException {
         Files.copy(download(address), to.toPath(), option);
     }
 
-    public static void download(File to, String address) throws Exception {
+    public static void download(File to, String address) throws IOException {
         download(to, address, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static InputStream download(String address) throws Exception {
+    public static InputStream download(String address) throws IOException {
         return new URL(address).openStream();
     }
 
+    public static void download(File to, String address, AbstractFileConnection connection, CopyOption option) throws Exception{
+        Files.copy(connection.get(address), to.toPath(), option);
+    }
+
     public static void download(File to, String address, AbstractFileConnection connection) throws Exception{
-        connection.get(address, to.toPath());
+        download(to, address, connection, StandardCopyOption.REPLACE_EXISTING);
     }
 }
