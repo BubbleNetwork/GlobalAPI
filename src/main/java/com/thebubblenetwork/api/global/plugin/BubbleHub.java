@@ -149,8 +149,8 @@ public abstract class BubbleHub<P> implements FileUpdater {
         }
 
         try{
-            if(getFTP().isConnected()){
-                getFTP().close();
+            if(getFileConnection().isConnected()){
+                getFileConnection().close();
             }
         }
         catch (Exception ex){
@@ -259,8 +259,8 @@ public abstract class BubbleHub<P> implements FileUpdater {
 
         //Connecting to FTP
         try{
-            getFTP().connect();
-            getFTP().login(propertiesFile.getString("fileConnection-user"), (temp = propertiesFile.getString("fileConnection-password")).equals("NONE") ? null : temp);
+            getFileConnection().connect();
+            getFileConnection().login(propertiesFile.getString("fileConnection-user"), (temp = propertiesFile.getString("fileConnection-password")).equals("NONE") ? null : temp);
         }
         catch (Exception ex){
             getLogger().log(Level.WARNING, "Could not connect to FTP", ex);
@@ -363,7 +363,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
         return propertiesFile;
     }
 
-    public AbstractFileConnection getFTP(){
+    public AbstractFileConnection getFileConnection(){
         return fileConnection;
     }
 
