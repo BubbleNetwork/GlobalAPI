@@ -19,6 +19,7 @@ public class SSHFileConnection extends AbstractFileConnection{
     public void login(String username, String password) throws JSchException{
         session = jSch.getSession(username, ip, port);
         session.setPassword(password);
+        //// FIXME: 03/04/2016 Security
         session.setConfig("StrictHostKeyChecking","no");
         session.connect();
         channel = (ChannelSftp) session.openChannel("sftp");

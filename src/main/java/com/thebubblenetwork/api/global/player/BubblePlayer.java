@@ -305,6 +305,24 @@ public abstract class BubblePlayer<T> {
         return false;
     }
 
+    public String getBanReason(){
+        try{
+            return getData().getString(PlayerData.BANREASON);
+        }
+        catch (InvalidBaseException e){
+            return null;
+        }
+    }
+
+    public String getBannedBy(){
+        try{
+            return getData().getString(PlayerData.BANBY);
+        }
+        catch (InvalidBaseException e){
+            return null;
+        }
+    }
+
     public Date getUnbanDate(){
         try {
             return new Date(getData().getNumber(PlayerData.BANTIME).longValue());

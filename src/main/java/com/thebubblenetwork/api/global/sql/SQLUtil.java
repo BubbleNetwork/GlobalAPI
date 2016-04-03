@@ -108,7 +108,7 @@ public class SQLUtil {
     }
 
     public static enum SQLDataType {
-        INT("INT"), TEXT("TEXT");
+        INT("INT"), TEXT("TEXT"), VARCHAR("VARCHAR"), VARINT("VARINT");
         final String output;
 
         SQLDataType(String output) {
