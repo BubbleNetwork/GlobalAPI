@@ -2,6 +2,7 @@ package com.thebubblenetwork.api.global.ftp;
 
 import com.jcraft.jsch.*;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 public class SSHFileConnection extends AbstractFileConnection{
@@ -35,7 +36,7 @@ public class SSHFileConnection extends AbstractFileConnection{
     }
 
     public InputStream get(String remote) throws JSchException, SftpException{
-        return channel.get(remote);
+        return new BufferedInputStream(channel.get(remote));
     }
 
     public void put(InputStream in, String remote) throws JSchException, SftpException {
