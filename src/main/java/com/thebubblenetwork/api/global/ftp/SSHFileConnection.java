@@ -3,6 +3,8 @@ package com.thebubblenetwork.api.global.ftp;
 import com.jcraft.jsch.*;
 
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class SSHFileConnection extends AbstractFileConnection{
     private JSch jSch = new JSch();
@@ -23,10 +25,11 @@ public class SSHFileConnection extends AbstractFileConnection{
         session.setConfig("StrictHostKeyChecking","no");
         session.connect();
         channel = (ChannelSftp) session.openChannel("sftp");
+        channel.connect();
     }
 
     public boolean isLoggedIn(){
-        return isConnected() && session.isConnected() && channel != null && channel.isConnected();
+        return isConnected() && session != null && session.isConnected() && channel != null && channel.isConnected();
     }
 
 
