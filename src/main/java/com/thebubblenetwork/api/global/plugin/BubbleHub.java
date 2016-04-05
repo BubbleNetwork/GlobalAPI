@@ -261,6 +261,8 @@ public abstract class BubbleHub<P> implements FileUpdater {
         try{
             getFileConnection().connect();
             getFileConnection().login(propertiesFile.getString("fileConnection-user"), (temp = propertiesFile.getString("fileConnection-password")).equals("NONE") ? null : temp);
+            getFileConnection().close();
+            getFileConnection().login(propertiesFile.getString("fileConnection-user"), (temp = propertiesFile.getString("fileConnection-password")).equals("NONE") ? null : temp);
         }
         catch (Exception ex){
             getLogger().log(Level.WARNING, "Could not connect to FTP", ex);
