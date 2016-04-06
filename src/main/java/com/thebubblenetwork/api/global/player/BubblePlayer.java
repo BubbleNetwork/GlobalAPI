@@ -356,8 +356,8 @@ public abstract class BubblePlayer<T> {
     public abstract String getName();
 
     public void finishChanges(){
-        if(isOnline())save();
-        else update();
+        if(isOnline())update();
+        else save();
     }
 
 
