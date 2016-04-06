@@ -355,7 +355,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
         getLogger().log(Level.INFO, "Load complete");
     }
 
-    public abstract BubblePlayer<?> getPlayer();
+    public abstract BubblePlayer<?> getBubblePlayer(UUID u) throws Exception;
 
     public NamelessAPI getNameless(){
         return api;
