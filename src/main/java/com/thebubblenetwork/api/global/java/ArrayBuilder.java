@@ -19,13 +19,10 @@ public class ArrayBuilder<T> implements Cloneable {
         buildnew();
     }
 
-    private ArrayBuilder(Class<T> clazz, int size, T[] array) {
+    private ArrayBuilder(Class<T> clazz, T[] array) {
         this.clazz = clazz;
-        length = size;
-        if (array.length != length) {
-            throw new IllegalArgumentException("Invalid array length");
-        }
         this.array = array;
+        length = array.length;
     }
 
     public T[] build() {
@@ -52,6 +49,6 @@ public class ArrayBuilder<T> implements Cloneable {
     }
 
     public ArrayBuilder<T> clone() {
-        return new ArrayBuilder<T>(clazz, length, array);
+        return new ArrayBuilder<T>(clazz, array.clone());
     }
 }

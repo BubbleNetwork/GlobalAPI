@@ -3,6 +3,7 @@ package com.thebubblenetwork.api.global.player;
 import com.google.common.base.Joiner;
 import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.PlayerData;
+import com.thebubblenetwork.api.global.data.RankData;
 import com.thebubblenetwork.api.global.plugin.BubbleHub;
 import com.thebubblenetwork.api.global.ranks.Rank;
 import com.thebubblenetwork.api.global.website.NamelessUser;
@@ -41,10 +42,21 @@ public abstract class BubblePlayer<T> {
     private T player;
     private NamelessUser user;
 
-    protected BubblePlayer(UUID u, PlayerData data) {
+    protected BubblePlayer(UUID u, Map<String,String> rawdata) {
         this.u = u;
-        this.data = data;
+        data = new PlayerData(rawdata){
+            protected void changed() {
+                BubblePlayer.this.finishChanges();
+            }
+        };
         user = new NamelessUser(BubbleHub.getInstance().getNameless(), u);
+        try{
+            getRankString();
+        }
+        catch (InvalidBaseException ex){
+            setRank(Rank.getDefault());
+            finishChanges();
+        }
     }
 
     public UUID getUUID() {
@@ -87,7 +99,7 @@ public abstract class BubblePlayer<T> {
 
     public void setRank(Rank rank) {
         getData().set(PlayerData.MAINRANK, rank.getName());
-        update();
+        finishChanges();
     }
 
     private String[] getSubRanksString() throws InvalidBaseException {
@@ -117,7 +129,7 @@ public abstract class BubblePlayer<T> {
 
     public void setSubRanks(Iterable<Rank> subRanks) {
         setList(PlayerData.SUBRANKS, toStrings(subRanks));
-        update();
+        finishChanges();
     }
 
     public UUID[] getFriends() {
@@ -134,7 +146,7 @@ public abstract class BubblePlayer<T> {
 
     public void setFriends(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDSLIST, toStrings(friends));
-        update();
+        finishChanges();
     }
 
     public UUID[] getFriendIncomingRequests() {
@@ -188,7 +200,7 @@ public abstract class BubblePlayer<T> {
 
     public void setTokens(int tokens) {
         getData().set(PlayerData.TOKENS, tokens);
-        update();
+        finishChanges();
     }
 
     public int getKeys() {
@@ -201,7 +213,7 @@ public abstract class BubblePlayer<T> {
 
     public void setKeys(int keys) {
         getData().set(PlayerData.KEYS, keys);
-        update();
+        finishChanges();
     }
 
     public boolean isAuthorized(String permission) {
@@ -210,12 +222,12 @@ public abstract class BubblePlayer<T> {
 
     public void setStat(String game, String indentifier, int id) {
         getData().set(PlayerData.STATSBASE + "." + game + "." + indentifier, id);
-        update();
+        finishChanges();
     }
 
     public void setKit(String game, String indentifier, int id) {
         getData().set(PlayerData.KITBASE + "." + game + "." + indentifier, id);
-        update();
+        finishChanges();
     }
 
     public void setFriendsIncomingRequests(UUID... friends) {
@@ -224,7 +236,7 @@ public abstract class BubblePlayer<T> {
 
     public void setFriendsIncomingRequests(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDINCOMINGRQ, toStrings(friends));
-        update();
+        finishChanges();
     }
 
     private Set<String> toStrings(Iterable<?> objects) {
@@ -241,7 +253,7 @@ public abstract class BubblePlayer<T> {
 
     public void setHubItem(String item, int id) {
         getData().set(PlayerData.ITEMSBASE + "." + item, id);
-        update();
+        finishChanges();
     }
 
     public void setHubItemUsable(String item, boolean b){
@@ -250,7 +262,7 @@ public abstract class BubblePlayer<T> {
 
     public void setNick(String nick) {
         getData().set(PlayerData.NICKNAME, nick);
-        update();
+        finishChanges();
     }
 
     public String getNickName() {
@@ -274,7 +286,7 @@ public abstract class BubblePlayer<T> {
 
     public void setUsingGadgets(boolean usingGadgets) {
         getData().set(PlayerData.GADGETS, usingGadgets);
-        update();
+        finishChanges();
     }
 
     public void unban(){
@@ -282,6 +294,7 @@ public abstract class BubblePlayer<T> {
         getData().remove(PlayerData.BANTIME);
         getData().remove(PlayerData.BANREASON);
         getData().remove(PlayerData.BANBY);
+        finishChanges();
     }
 
     public void ban(Date unbanby, String reason, String by){
@@ -289,6 +302,7 @@ public abstract class BubblePlayer<T> {
         getData().set(PlayerData.BANTIME, unbanby.getTime());
         getData().set(PlayerData.BANREASON, reason);
         getData().set(PlayerData.BANBY, by);
+        finishChanges();
     }
 
     public boolean isBanned(){
@@ -341,8 +355,20 @@ public abstract class BubblePlayer<T> {
 
     public abstract String getName();
 
+    public void finishChanges(){
+        if(isOnline())save();
+        else update();
+    }
 
-    public void update() {
 
+    public boolean isOnline(){
+        return true;
+    }
+
+    protected void save(){
+
+    }
+
+    protected void update() {
     }
 }

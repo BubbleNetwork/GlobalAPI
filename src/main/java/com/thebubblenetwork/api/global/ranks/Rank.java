@@ -43,7 +43,7 @@ public class Rank {
         }
         //If the rank has data re-create it
         if(map != null){
-            r = new Rank(name,new RankData(new HashMap<>(map)));
+            r = new Rank(name,new HashMap<>(map));
             ranks.add(r);
         }
     }
@@ -79,9 +79,13 @@ public class Rank {
     private RankData data;
     private String name;
 
-    public Rank(String name, RankData data) {
+    public Rank(String name, Map<String, String> data) {
         this.name = name;
-        this.data = data;
+        this.data = new RankData(data){
+            protected void changed() {
+
+            }
+        };
     }
 
     public String getName() {

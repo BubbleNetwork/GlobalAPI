@@ -5,6 +5,7 @@ import com.thebubblenetwork.api.global.file.PropertiesFile;
 import com.thebubblenetwork.api.global.ftp.AbstractFileConnection;
 import com.thebubblenetwork.api.global.ftp.FTPFileConnection;
 import com.thebubblenetwork.api.global.ftp.SSHFileConnection;
+import com.thebubblenetwork.api.global.player.BubblePlayer;
 import com.thebubblenetwork.api.global.plugin.updater.FileUpdater;
 import com.thebubblenetwork.api.global.plugin.updater.SQLUpdater;
 import com.thebubblenetwork.api.global.plugin.updater.Updatetask;
@@ -262,6 +263,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
             getFileConnection().connect();
             getFileConnection().login(propertiesFile.getString("fileConnection-user"), (temp = propertiesFile.getString("fileConnection-password")).equals("NONE") ? null : temp);
             getFileConnection().close();
+            getFileConnection().connect();
             getFileConnection().login(propertiesFile.getString("fileConnection-user"), (temp = propertiesFile.getString("fileConnection-password")).equals("NONE") ? null : temp);
         }
         catch (Exception ex){
@@ -352,6 +354,8 @@ public abstract class BubbleHub<P> implements FileUpdater {
 
         getLogger().log(Level.INFO, "Load complete");
     }
+
+    public abstract BubblePlayer<?> getPlayer();
 
     public NamelessAPI getNameless(){
         return api;

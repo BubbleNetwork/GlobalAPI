@@ -18,7 +18,6 @@ import java.util.Set;
  * Created by Jacob on 31/12/2015.
  */
 public class DataObject {
-
     public static Map<String, String> loadData(ResultSet set) throws SQLException {
         Map<String, String> datamap = new HashMap<>();
         while (set.next()) {
@@ -87,6 +86,7 @@ public class DataObject {
         } else {
             getRaw().put(s, s2);
         }
+        changed();
     }
 
     public void set(String s, Integer i) {
@@ -95,6 +95,7 @@ public class DataObject {
         } else {
             getRaw().put(s, String.valueOf(i));
         }
+        changed();
     }
 
     public void set(String s, Number i) {
@@ -103,6 +104,7 @@ public class DataObject {
         } else {
             getRaw().put(s, String.valueOf(i));
         }
+        changed();
     }
 
     public void set(String s, Boolean b) {
@@ -111,9 +113,15 @@ public class DataObject {
         } else {
             getRaw().put(s, String.valueOf(b));
         }
+        changed();
     }
 
     public void remove(String s){
         getRaw().remove(s);
+        changed();
+    }
+
+    protected void changed(){
+
     }
 }
