@@ -26,7 +26,7 @@ import java.util.Map;
 public class PlayerDataResponse extends AbstractDataMapMessageObject implements PlayerMessage {
     private String name;
 
-    public PlayerDataResponse(String name, Map<String, String> data) {
+    public PlayerDataResponse(String name, Map<String, String> data, Map<String, String> rawPunishmentData) {
         super(data);
         this.name = name;
     }

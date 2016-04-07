@@ -27,9 +27,11 @@ import java.util.logging.Level;
  */
 public abstract class AbstractDataMapMessageObject extends AbstractMessageObject implements DataMessage {
     private Map<String, String> data;
+    private Map<String, String> rawPunishmentData;
 
-    public AbstractDataMapMessageObject(Map<String, String> data) {
+    public AbstractDataMapMessageObject(Map<String, String> data, Map<String, String> rawPunishmentData) {
         this.data = data;
+        this.rawPunishmentData = rawPunishmentData;
     }
 
     public AbstractDataMapMessageObject(byte[] bytes) {
@@ -75,5 +77,9 @@ public abstract class AbstractDataMapMessageObject extends AbstractMessageObject
 
     public Map<String, String> getData() {
         return data;
+    }
+
+    public Map<String, String> getRawPunishmentData() {
+        return rawPunishmentData;
     }
 }
