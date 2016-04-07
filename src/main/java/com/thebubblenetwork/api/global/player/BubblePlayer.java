@@ -55,7 +55,6 @@ public abstract class BubblePlayer<T> {
         }
         catch (InvalidBaseException ex){
             setRank(Rank.getDefault());
-            finishChanges();
         }
     }
 
@@ -129,7 +128,6 @@ public abstract class BubblePlayer<T> {
 
     public void setSubRanks(Iterable<Rank> subRanks) {
         setList(PlayerData.SUBRANKS, toStrings(subRanks));
-        finishChanges();
     }
 
     public UUID[] getFriends() {
@@ -146,7 +144,6 @@ public abstract class BubblePlayer<T> {
 
     public void setFriends(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDSLIST, toStrings(friends));
-        finishChanges();
     }
 
     public UUID[] getFriendIncomingRequests() {
@@ -200,7 +197,6 @@ public abstract class BubblePlayer<T> {
 
     public void setTokens(int tokens) {
         getData().set(PlayerData.TOKENS, tokens);
-        finishChanges();
     }
 
     public int getKeys() {
@@ -213,7 +209,6 @@ public abstract class BubblePlayer<T> {
 
     public void setKeys(int keys) {
         getData().set(PlayerData.KEYS, keys);
-        finishChanges();
     }
 
     public boolean isAuthorized(String permission) {
@@ -222,12 +217,10 @@ public abstract class BubblePlayer<T> {
 
     public void setStat(String game, String indentifier, int id) {
         getData().set(PlayerData.STATSBASE + "." + game + "." + indentifier, id);
-        finishChanges();
     }
 
     public void setKit(String game, String indentifier, int id) {
         getData().set(PlayerData.KITBASE + "." + game + "." + indentifier, id);
-        finishChanges();
     }
 
     public void setFriendsIncomingRequests(UUID... friends) {
@@ -236,7 +229,6 @@ public abstract class BubblePlayer<T> {
 
     public void setFriendsIncomingRequests(Iterable<UUID> friends) {
         setList(PlayerData.FRIENDINCOMINGRQ, toStrings(friends));
-        finishChanges();
     }
 
     private Set<String> toStrings(Iterable<?> objects) {
@@ -253,7 +245,6 @@ public abstract class BubblePlayer<T> {
 
     public void setHubItem(String item, int id) {
         getData().set(PlayerData.ITEMSBASE + "." + item, id);
-        finishChanges();
     }
 
     public void setHubItemUsable(String item, boolean b){
@@ -262,7 +253,6 @@ public abstract class BubblePlayer<T> {
 
     public void setNick(String nick) {
         getData().set(PlayerData.NICKNAME, nick);
-        finishChanges();
     }
 
     public String getNickName() {
@@ -286,7 +276,6 @@ public abstract class BubblePlayer<T> {
 
     public void setUsingGadgets(boolean usingGadgets) {
         getData().set(PlayerData.GADGETS, usingGadgets);
-        finishChanges();
     }
 
     public void unban(){
@@ -294,7 +283,6 @@ public abstract class BubblePlayer<T> {
         getData().remove(PlayerData.BANTIME);
         getData().remove(PlayerData.BANREASON);
         getData().remove(PlayerData.BANBY);
-        finishChanges();
     }
 
     public void ban(Date unbanby, String reason, String by){
@@ -302,7 +290,6 @@ public abstract class BubblePlayer<T> {
         getData().set(PlayerData.BANTIME, unbanby.getTime());
         getData().set(PlayerData.BANREASON, reason);
         getData().set(PlayerData.BANBY, by);
-        finishChanges();
     }
 
     public boolean isBanned(){
@@ -343,6 +330,19 @@ public abstract class BubblePlayer<T> {
         } catch (InvalidBaseException e) {
             return null;
         }
+    }
+
+    public boolean isSpectating(){
+        try{
+            return getData().getBoolean(PlayerData.SPECTATING);
+        }
+        catch (InvalidBaseException e){
+            return false;
+        }
+    }
+
+    public void setSpectating(boolean spectating){
+        getData().set(PlayerData.SPECTATING, spectating);
     }
 
     public boolean canAfford(int tokens){
