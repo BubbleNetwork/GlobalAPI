@@ -1,6 +1,7 @@
 package com.thebubblenetwork.api.global.plugin;
 
 import com.thebubblenetwork.api.global.bubblepackets.PacketHub;
+import com.thebubblenetwork.api.global.data.RankData;
 import com.thebubblenetwork.api.global.file.PropertiesFile;
 import com.thebubblenetwork.api.global.ftp.AbstractFileConnection;
 import com.thebubblenetwork.api.global.ftp.FTPFileConnection;
@@ -9,6 +10,7 @@ import com.thebubblenetwork.api.global.player.BubblePlayer;
 import com.thebubblenetwork.api.global.plugin.updater.FileUpdater;
 import com.thebubblenetwork.api.global.plugin.updater.SQLUpdater;
 import com.thebubblenetwork.api.global.plugin.updater.Updatetask;
+import com.thebubblenetwork.api.global.ranks.Rank;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
 import com.thebubblenetwork.api.global.type.ServerType;
@@ -20,9 +22,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,25 +87,54 @@ public abstract class BubbleHub<P> implements FileUpdater {
         getLogger().log(Level.INFO, "Finding updates table");
 
         try {
-            if (!SQLUtil.tableExists(getConnection(), "updates")) {
-                getLogger().log(Level.INFO, "Creating updates table");
-                getConnection().executeSQL("CREATE TABLE `updates` (" +
-                        "`artifact` VARCHAR(32) NOT NULL," +
-                        "`version` INT(3) NOT NULL," +
-                        "`url` VARCHAR(255) NOT NULL," +
-                        "PRIMARY KEY (`artifact`)," +
-                        "UNIQUE INDEX `UNIQUE KEY` (`artifact`)," +
-                        "UNIQUE INDEX `UNIQUE URL` (`url`)," +
-                        "INDEX `KEY` (`artifact`)" +
-                        ")" +
-                        ";");
-                //TODO - SQL API
-            }
+
+            loadUpdatesTable();
+
         } catch (Exception ex) {
             getLogger().log(Level.SEVERE, "Could not create updates table", ex);
+            endSetup("Could not create updates table");
         }
 
+        getLogger().log(Level.INFO, "Loading PlayerData table");
 
+        try {
+
+            loadPlayerDataTable();
+
+        } catch (Exception ex) {
+
+            //player data table was not able to be loaded, end setup
+            getLogger().log(Level.SEVERE, "Could not load playerdata table.", ex);
+            endSetup("Could not load playerdata table.");
+
+        }
+
+        getLogger().log(Level.INFO, "Loading PunishmentData table");
+
+        try {
+
+            loadPunishmentsTable();
+
+        } catch (Exception ex) {
+
+            //punishments table could not be loaaded, end setup
+            getLogger().log(Level.SEVERE, "Could not load punishmetnsdata table.", ex);
+            endSetup("Could not load punishments table.");
+
+        }
+
+        getLogger().log(Level.INFO, "Loading ranks");
+
+        try {
+
+            loadRanks();
+
+        } catch (Exception ex) {
+            getLogger().log(Level.SEVERE, "Could not load ranks");
+            endSetup("Could not load ranks");
+        }
+
+        
         runTaskLater(new Runnable() {
             public void run() {
                 try {
@@ -277,28 +306,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
         getLogger().log(Level.INFO, "Finding server types...");
 
         try {
-            if (!SQLUtil.tableExists(getConnection(), "servertypes")) {
-                connection.executeSQL("CREATE TABLE `servertypes` (" +
-                        "`name` VARCHAR(32) NOT NULL," +
-                        "`prefix` VARCHAR(16) NOT NULL," +
-                        "`download` VARCHAR(255) NOT NULL," +
-                        "`maxplayer` INT(3) NOT NULL," +
-                        "`low-limit` INT(3) NOT NULL," +
-                        "`high-limit` INT(3) NOT NULL," +
-                        "PRIMARY KEY (`name`)," +
-                        "UNIQUE INDEX `UNIQUE` (`name`, `prefix`)," +
-                        "UNIQUE INDEX `DOWNLOADUNIQUE` (`download`)," +
-                        "INDEX `NAME KEY` (`name`)," +
-                        "INDEX `PREFIX` (`prefix`)," +
-                        "INDEX `DOWNLOAD` (`download`)" +
-                        ")" +
-                        ";");
-            }
-            ResultSet set = SQLUtil.query(getConnection(), "servertypes", "*", new SQLUtil.Where("1"));
-            while (set.next()) {
-                ServerType.registerType(new ServerType(set.getString("name"), set.getString("prefix"), set.getString("download"),set.getInt("maxplayer"), set.getInt("low-limit"), set.getInt("high-limit")));
-            }
-            set.close();
+            loadServerTypes();
         } catch (Exception ex) {
             getLogger().log(Level.WARNING, "Could not find server types", ex);
             endSetup("Could not find server types");
@@ -417,4 +425,126 @@ public abstract class BubbleHub<P> implements FileUpdater {
     }
 
     public abstract void stop();
+
+    public void loadPlayerDataTable() throws SQLException, ClassNotFoundException {
+        //check if the playerdata table exists
+        if (!SQLUtil.tableExists(getConnection(), "playerdata")) {
+
+            //create the playerdata table
+            getLogger().log(Level.INFO, "PlayerData table does not exist, creating...");
+            getConnection().executeSQL(
+                    "CREATE TABLE `playerdata` (" +
+                            "`uuid` VARCHAR(36) NOT NULL," +
+                            "`value` TEXT NOT NULL," +
+                            "`key` TEXT NOT NULL," +
+                            "INDEX `UUID KEY` (`uuid`)" +
+                            ");");
+
+            //log successful creation
+            getLogger().log(Level.INFO, "PlayerData table created successfully!");
+        }
+    }
+
+    public void loadPunishmentsTable() throws SQLException, ClassNotFoundException {
+
+        //check if the punishments table exists
+        if (!SQLUtil.tableExists(getConnection(), "punishments")) {
+
+            //create the punishments table
+            getConnection().executeSQL(
+                    "CREATE TABLE `punishments` (" +
+                            "`uuid` VARCHAR(36) NOT NULL," +
+                            "`value` TEXT NOT NULL," +
+                            "`key` TEXT NOT NULL," +
+                            "INDEX `UUID KEY` (`uuid`)" +
+                            ");");
+
+            //log successful createion
+            getLogger().log(Level.INFO, "Punishments table created successfully!");
+
+        }
+
+    }
+
+    public void loadRanks() throws SQLException, ClassNotFoundException {
+        Rank.getRanks().clear();
+        if(!SQLUtil.tableExists(getConnection(),"ranks")){
+            getLogger().log(Level.INFO,"Rank table does not exist, creating...");
+            getConnection().executeSQL(
+                    "CREATE TABLE `ranks` (" +
+                            "`rank` VARCHAR(32) NOT NULL DEFAULT 'default'," +
+                            "`value` TEXT NOT NULL," +
+                            "`key` TEXT NOT NULL," +
+                            "INDEX `rank` (`rank`)" +
+                            ");");
+            RankData defaultrank = new RankData(new HashMap<String,String>());
+            defaultrank.set("default",true);
+            Rank.loadRank("default", defaultrank.getRaw());
+            getLogger().log(Level.INFO,"Created ranks table");
+        }
+        ResultSet set = SQLUtil.query(getConnection(), "ranks", "*", new SQLUtil.Where("1"));
+        Map<String, Map<String, String>> map = new HashMap<>();
+        while (set.next()) {
+            String rankname = set.getString("rank");
+            Map<String, String> currentmap = map.containsKey(rankname) ? map.get(rankname) : new HashMap<String, String>();
+            currentmap.put(set.getString("key"), set.getString("value"));
+            map.put(rankname, currentmap);
+        }
+        set.close();
+        for (Map.Entry<String, Map<String, String>> entry : map.entrySet()) {
+            Rank.loadRank(entry.getKey(), entry.getValue());
+            getLogger().log(Level.INFO, "Loaded rank: " + entry.getKey());
+        }
+    }
+
+    public void loadUpdatesTable() throws SQLException, ClassNotFoundException {
+
+        if (!SQLUtil.tableExists(getConnection(), "updates")) {
+            getLogger().log(Level.INFO, "Creating updates table");
+            getConnection().executeSQL("CREATE TABLE `updates` (" +
+                    "`artifact` VARCHAR(32) NOT NULL," +
+                    "`version` INT(3) NOT NULL," +
+                    "`url` VARCHAR(255) NOT NULL," +
+                    "PRIMARY KEY (`artifact`)," +
+                    "UNIQUE INDEX `UNIQUE KEY` (`artifact`)," +
+                    "UNIQUE INDEX `UNIQUE URL` (`url`)," +
+                    "INDEX `KEY` (`artifact`)" +
+                    ")" +
+                    ";");
+
+            //log successful creation
+            getLogger().log(Level.INFO, "Updates table created successfully!");
+        }
+
+    }
+
+    public void loadServerTypes() throws SQLException, ClassNotFoundException {
+
+        if (!SQLUtil.tableExists(getConnection(), "servertypes")) {
+            connection.executeSQL("CREATE TABLE `servertypes` (" +
+                    "`name` VARCHAR(32) NOT NULL," +
+                    "`prefix` VARCHAR(16) NOT NULL," +
+                    "`download` VARCHAR(255) NOT NULL," +
+                    "`maxplayer` INT(3) NOT NULL," +
+                    "`low-limit` INT(3) NOT NULL," +
+                    "`high-limit` INT(3) NOT NULL," +
+                    "PRIMARY KEY (`name`)," +
+                    "UNIQUE INDEX `UNIQUE` (`name`, `prefix`)," +
+                    "UNIQUE INDEX `DOWNLOADUNIQUE` (`download`)," +
+                    "INDEX `NAME KEY` (`name`)," +
+                    "INDEX `PREFIX` (`prefix`)," +
+                    "INDEX `DOWNLOAD` (`download`)" +
+                    ")" +
+                    ";");
+        }
+
+        ResultSet set = SQLUtil.query(getConnection(), "servertypes", "*", new SQLUtil.Where("1"));
+        while (set.next()) {
+            ServerType.registerType(new ServerType(set.getString("name"), set.getString("prefix"), set.getString("download"),set.getInt("maxplayer"), set.getInt("low-limit"), set.getInt("high-limit")));
+        }
+        set.close();
+
+        getLogger().log(Level.INFO, "Loaded ServerTypes successfully!");
+
+    }
 }
