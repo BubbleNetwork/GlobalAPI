@@ -134,7 +134,7 @@ public abstract class BubbleHub<P> implements FileUpdater {
             endSetup("Could not load ranks");
         }
 
-        
+
         runTaskLater(new Runnable() {
             public void run() {
                 try {
