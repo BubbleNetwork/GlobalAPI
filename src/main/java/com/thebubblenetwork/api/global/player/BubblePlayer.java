@@ -216,7 +216,11 @@ public abstract class BubblePlayer<T> {
         return getRank().isAuthorized(permission);
     }
 
-    public void setStat(String game, String indentifier, int id) {
+    public void incrementStat(String game, String indentifier, double increment){
+        setStat(game, indentifier, getStats(game, indentifier) + increment);
+    }
+
+    public void setStat(String game, String indentifier, double id) {
         getData().set(PlayerData.STATSBASE + "." + game + "." + indentifier, id);
         finishChanges();
     }
