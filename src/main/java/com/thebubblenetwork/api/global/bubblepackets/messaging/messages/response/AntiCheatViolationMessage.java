@@ -30,6 +30,10 @@ public class AntiCheatViolationMessage extends AbstractMessageObject implements 
         out.writeDouble(violationWrapper.getAddedVL());
     }
 
+    public ViolationWrapper getViolationWrapper() {
+        return violationWrapper;
+    }
+
     public String getName(){
         return violationWrapper.getPlayer();
     }
