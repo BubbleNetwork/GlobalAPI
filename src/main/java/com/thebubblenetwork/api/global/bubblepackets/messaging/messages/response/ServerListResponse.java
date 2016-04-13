@@ -39,6 +39,7 @@ public class ServerListResponse extends AbstractMessageObject {
             server.id = in.readInt();
             server.playercount = in.readInt();
             server.connect = in.readBoolean();
+            serverList.add(server);
         }
     }
 
