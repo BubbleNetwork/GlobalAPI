@@ -48,12 +48,28 @@ public class ServerListResponse extends AbstractMessageObject {
         }
     }
 
+    public List<EncapsulatedServer> getServerList(){
+        return serverList;
+    }
+
     public ServerType getServertype() {
         return ServerType.getType(servertype);
     }
 
-    static class EncapsulatedServer{
-        int id, playercount;
-        boolean connect;
+    public static class EncapsulatedServer{
+        private int id, playercount;
+        private boolean connect;
+
+        public int getId() {
+            return id;
+        }
+
+        public boolean isConnect() {
+            return connect;
+        }
+
+        public int getPlayercount() {
+            return playercount;
+        }
     }
 }
