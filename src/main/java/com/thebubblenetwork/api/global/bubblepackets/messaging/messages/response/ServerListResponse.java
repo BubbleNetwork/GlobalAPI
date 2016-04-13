@@ -21,6 +21,10 @@ public class ServerListResponse extends AbstractMessageObject {
     private String servertype;
     private List<EncapsulatedServer> serverList;
 
+    public ServerListResponse(byte[] bytes) {
+        super(bytes);
+    }
+
     public ServerListResponse(ServerType servertype, List<EncapsulatedServer> serverList) {
         this.servertype = servertype.getName();
         this.serverList = serverList;
