@@ -44,7 +44,7 @@ public class ServerListResponse extends AbstractMessageObject {
 
     public void parse(DataOutputStream out) throws IOException {
         out.writeUTF(servertype);
-        out.write(serverList.size());
+        out.writeInt(serverList.size());
         for(EncapsulatedServer server: serverList){
             out.writeInt(server.id);
             out.writeInt(server.playercount);
