@@ -2,12 +2,15 @@ package com.thebubblenetwork.api.global.website;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Chars;
+import com.thebubblenetwork.api.global.plugin.BubbleHub;
 import com.thebubblenetwork.api.global.sql.SQLConnection;
 import com.thebubblenetwork.api.global.sql.SQLUtil;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
  * The Bubble Network 2016
@@ -25,6 +28,11 @@ public class NamelessAPI {
     public NamelessAPI(NamelessAPISettings settings){
         this.settings = settings;
         deprecated = new SQLConnection(settings.getHost(),3306,settings.getDb(),settings.getUser(),settings.getPass());
+        try {
+            deprecated.openConnection();
+        } catch (Exception e) {
+            BubbleHub.getInstance().getLogger().log(Level.WARNING, "Failed to connect to NamelessAPI", e);
+        }
     }
 
     public boolean setupPlayer(String player, String email, String ip, UUID u){

@@ -188,7 +188,9 @@ public abstract class BubbleHub<P> implements FileUpdater {
         }
 
         try{
-            if(api.getConnection().checkConnection())api.getConnection().closeConnection();
+            if(api.getConnection().checkConnection()) {
+                api.getConnection().closeConnection();
+            }
         }
         catch (Exception e){
             getLogger().log(Level.SEVERE, "Could not close nameless database connection", e);
