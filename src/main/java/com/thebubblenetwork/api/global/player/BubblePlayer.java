@@ -319,6 +319,25 @@ public abstract class BubblePlayer<T> {
         else save();
     }
 
+    public void useReward(String reward){
+        getData().set(reward, System.currentTimeMillis());
+        finishChanges();
+    }
+
+    public boolean hasReward(String reward){
+        return isAuthorized(PlayerData.REWARDPERMISSION + "." + reward);
+    }
+
+    public boolean canUseReward(String reward, long rewardtime){
+        try{
+            long date = getData().getNumber(PlayerData.REWARD + "." + reward).longValue();
+            return new Date(date + rewardtime).before(new Date());
+        }
+        catch (InvalidBaseException ex){
+            return true;
+        }
+    }
+
 
     public boolean isOnline(){
         return true;
