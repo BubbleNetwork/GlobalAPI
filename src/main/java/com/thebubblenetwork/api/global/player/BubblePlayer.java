@@ -5,6 +5,7 @@ import com.thebubblenetwork.api.global.data.InvalidBaseException;
 import com.thebubblenetwork.api.global.data.PlayerData;
 import com.thebubblenetwork.api.global.data.PunishmentData;
 import com.thebubblenetwork.api.global.data.RankData;
+import com.thebubblenetwork.api.global.java.DateUTIL;
 import com.thebubblenetwork.api.global.plugin.BubbleHub;
 import com.thebubblenetwork.api.global.ranks.Rank;
 import com.thebubblenetwork.api.global.website.NamelessUser;
@@ -335,6 +336,16 @@ public abstract class BubblePlayer<T> {
         }
         catch (InvalidBaseException ex){
             return true;
+        }
+    }
+
+    public String getWaitTime(String reward, long rewardtime){
+        try{
+            long date = getData().getNumber(PlayerData.REWARD + "." + reward).longValue();
+            return DateUTIL.formatDateDiff(date + rewardtime);
+        }
+        catch (InvalidBaseException ex){
+            return "now";
         }
     }
 
