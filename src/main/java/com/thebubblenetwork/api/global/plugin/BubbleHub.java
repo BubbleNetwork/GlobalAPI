@@ -326,7 +326,6 @@ public abstract class BubbleHub<P> implements FileUpdater {
 
         getLogger().log(Level.INFO,"Adding updaters");
 
-        addUpdater(this);
         addUpdater(new SQLUpdater() {
             public void update(SQLConnection connection) throws SQLException, ClassNotFoundException {
                 ResultSet set = null;
@@ -334,7 +333,24 @@ public abstract class BubbleHub<P> implements FileUpdater {
                     set = SQLUtil.query(getConnection(), "servertypes", "*", new SQLUtil.Where("1"));
                     final Set<ServerType> serverTypeObjects = new HashSet<>();
                     while (set.next()) {
-                        serverTypeObjects.add(new ServerType(set.getString("name"), set.getString("prefix"), set.getString("download"), set.getInt("maxplayer"), set.getInt("low-limit"), set.getInt("high-limit")));
+                        String name = set.getString("name");
+                        ServerType type = ServerType.getType(name);
+                        String prefix = set.getString("prefix");
+                        String download = set.getString("download");
+                        int maxplayer = set.getInt("maxplayer");
+                        int lowlimit = set.getInt("low-limit");
+                        int highlimit = set.getInt("high-limit");
+                        if(type == null){
+                            type = new ServerType(name, prefix, download, maxplayer, lowlimit, highlimit);
+                        }
+                        else{
+                            type.setPrefix(prefix);
+                            type.setDownload(download);
+                            type.setMaxplayers(maxplayer);
+                            type.setLowlimit(lowlimit);
+                            type.setHighlimit(highlimit);
+                        }
+                        serverTypeObjects.add(type);
                     }
                     runTaskLater(new Runnable() {
                         public void run() {

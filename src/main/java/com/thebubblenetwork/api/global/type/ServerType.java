@@ -69,4 +69,32 @@ public class ServerType {
     public int getHighlimit() {
         return highlimit;
     }
+
+    public static void setTypes(Set<ServerType> types) {
+        ServerType.types = types;
+    }
+
+    public void setHighlimit(int highlimit) {
+        this.highlimit = highlimit;
+    }
+
+    public void setLowlimit(int lowlimit) {
+        this.lowlimit = lowlimit;
+    }
+
+    public void setMaxplayers(int maxplayers) {
+        this.maxplayers = maxplayers;
+    }
+
+    public void setDownload(String download) {
+        this.download = download;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
