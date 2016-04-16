@@ -321,7 +321,7 @@ public abstract class BubblePlayer<T> {
     }
 
     public void useReward(String reward){
-        getData().set(reward, System.currentTimeMillis());
+        getData().set(PlayerData.REWARD + "." + reward, System.currentTimeMillis());
         finishChanges();
     }
 
