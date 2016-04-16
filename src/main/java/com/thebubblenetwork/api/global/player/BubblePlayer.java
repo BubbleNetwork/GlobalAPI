@@ -332,7 +332,7 @@ public abstract class BubblePlayer<T> {
     public boolean canUseReward(String reward, long rewardtime){
         try{
             long date = getData().getNumber(PlayerData.REWARD + "." + reward).longValue();
-            return new Date(date + rewardtime).before(new Date());
+            return (date + rewardtime) <= System.currentTimeMillis();
         }
         catch (InvalidBaseException ex){
             return true;
