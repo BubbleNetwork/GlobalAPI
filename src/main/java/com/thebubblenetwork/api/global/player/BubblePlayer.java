@@ -326,7 +326,7 @@ public abstract class BubblePlayer<T> {
     }
 
     public boolean hasReward(String reward){
-        return isAuthorized(PlayerData.REWARDPERMISSION + "." + reward);
+        return isAuthorized(PlayerData.REWARD + "." + reward);
     }
 
     public boolean canUseReward(String reward, long rewardtime){
