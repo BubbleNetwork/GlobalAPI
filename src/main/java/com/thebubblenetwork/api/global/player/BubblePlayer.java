@@ -316,6 +316,19 @@ public abstract class BubblePlayer<T> {
         }
     }
 
+    public void setPetname(String pet, String petname){
+        getData().set(PlayerData.PETNAME + "." + pet, petname);
+    }
+
+    public String getPetname(String pet){
+        try{
+            return getData().getString(PlayerData.PETNAME + "." + pet);
+        }
+        catch (InvalidBaseException e){
+            return null;
+        }
+    }
+
 
     public boolean isOnline(){
         return true;
