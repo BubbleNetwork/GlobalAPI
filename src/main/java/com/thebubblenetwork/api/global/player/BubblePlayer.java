@@ -125,34 +125,22 @@ public abstract class BubblePlayer<T> {
         setSubRanks(Arrays.asList(subRanks));
     }
 
+    private Set<String> toStrings(Iterable<?> objects) {
+        Set<String> set = new HashSet<>();
+        for (Object o : objects) {
+            set.add(o.toString());
+        }
+        return set;
+    }
+
+    private void setList(String base, Iterable<String> friends) {
+        getData().set(base, Joiner.on(",").join(friends));
+        finishChanges();
+    }
+
     public void setSubRanks(Iterable<Rank> subRanks) {
         setList(PlayerData.SUBRANKS, toStrings(subRanks));
         finishChanges();
-    }
-
-    public UUID[] getFriends() {
-        try {
-            return getData().getUUIDList(PlayerData.FRIENDSLIST);
-        } catch (InvalidBaseException e) {
-            return new UUID[0];
-        }
-    }
-
-    public void setFriends(UUID... friends) {
-        setFriends(Arrays.asList(friends));
-    }
-
-    public void setFriends(Iterable<UUID> friends) {
-        setList(PlayerData.FRIENDSLIST, toStrings(friends));
-        finishChanges();
-    }
-
-    public UUID[] getFriendIncomingRequests() {
-        try {
-            return getData().getUUIDList(PlayerData.FRIENDINCOMINGRQ);
-        } catch (InvalidBaseException e) {
-            return new UUID[0];
-        }
     }
 
     public double getStats(String game, String stat) {
@@ -228,27 +216,6 @@ public abstract class BubblePlayer<T> {
 
     public void setKit(String game, String indentifier, int id) {
         getData().set(PlayerData.KITBASE + "." + game + "." + indentifier, id);
-        finishChanges();
-    }
-
-    public void setFriendsIncomingRequests(UUID... friends) {
-        setFriendsIncomingRequests(Arrays.asList(friends));
-    }
-
-    public void setFriendsIncomingRequests(Iterable<UUID> friends) {
-        setList(PlayerData.FRIENDINCOMINGRQ, toStrings(friends));
-    }
-
-    private Set<String> toStrings(Iterable<?> objects) {
-        Set<String> set = new HashSet<>();
-        for (Object o : objects) {
-            set.add(o.toString());
-        }
-        return set;
-    }
-
-    private void setList(String base, Iterable<String> friends) {
-        getData().set(base, Joiner.on(",").join(friends));
         finishChanges();
     }
 

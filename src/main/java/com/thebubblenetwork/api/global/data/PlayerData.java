@@ -14,16 +14,4 @@ public class PlayerData extends DataObject {
     public PlayerData(Map<String, String> loaded) {
         super(loaded);
     }
-
-    public UUID[] getUUIDList(String indentifier) throws InvalidBaseException {
-        String[] list = getString(indentifier).split(",");
-        Set<UUID> uuids = new HashSet<>();
-        for (String s : list) {
-            try {
-                uuids.add(UUID.fromString(s));
-            } catch (Exception ex) {
-            }
-        }
-        return uuids.toArray(new UUID[uuids.size()]);
-    }
 }
